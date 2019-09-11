@@ -7,10 +7,15 @@ declare(strict_types=1);
 namespace DecodeLabs\Veneer\Loader;
 
 use DecodeLabs\Veneer\Loader;
+use DecodeLabs\Veneer\Facade;
+
+use Psr\Container\ContainerInterface;
 
 class Aliasing implements Loader
 {
     protected $registered = false;
+    protected $facades = [];
+
 
     /**
      * Check if loader has been registered
@@ -55,6 +60,40 @@ class Aliasing implements Loader
         $name = array_pop($parts);
         $namespace = implode('\\', $parts);
 
-        dd($name, $namespace);
+        if (!$facade = ($this->facades[$name] ?? null)) {
+            return;
+        }
+
+        $class = get_class($facade->getTarget());
+
+        if ($facade->isRoot() && !class_exists($name)) {
+            class_alias($class, $name);
+        }
+
+        if ($facade->isCurrent() && !empty($namespace) && !class_exists($namespace.'\\'.$name)) {
+            class_alias($class, $namespace.'\\'.$name);
+        }
+
+        if (null !== ($ns = $facade->getNamespace()) && !class_exists($ns.'\\'.$name)) {
+            class_alias($class, $ns.'\\'.$name);
+        }
+    }
+
+
+    /**
+     * Bind a facade
+     */
+    public function bind(Facade $facade): Loader
+    {
+        $this->facades[$facade->getName()] = $facade;
+        return $this;
+    }
+
+    /**
+     * Has facade been bound?
+     */
+    public function hasFacade(string $name): bool
+    {
+        return isset($this->facades[$name]);
     }
 }
