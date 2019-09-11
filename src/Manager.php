@@ -11,8 +11,26 @@ use Psr\Container\ContainerInterface;
 
 class Manager
 {
+    protected static $default;
+
     protected $container;
     protected $loader;
+
+    /**
+     * Set global default manager
+     */
+    public static function setDefault(?Manager $default): void
+    {
+        self::$default = $default;
+    }
+
+    /**
+     * Get global default manager
+     */
+    public static function getDefault(): ?Manager
+    {
+        return self::$default;
+    }
 
     /**
      * Init with container and loader

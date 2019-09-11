@@ -28,10 +28,12 @@ trait FacadeTargetTrait
         }
 
         if (!$veneer) {
-            if ($container && $container->has(Manager::class)) {
+            if ($default = Manager::getDefault()) {
+                $veneer = $default;
+            } elseif ($container && $container->has(Manager::class)) {
                 $veneer = $container->get(Manager::class);
             } else {
-                $veneer = new Manager($container);
+                Manager::setDefault($veneer = new Manager($container));
 
                 if ($container && method_exists($container, 'bind')) {
                     $container->bind(Manager::class, $veneer);
