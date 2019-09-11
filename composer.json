@@ -1,0 +1,29 @@
+{
+    "name": "decodelabs/veneer",
+    "description": "Automated static facades",
+    "type": "library",
+    "keywords": ["library", "tools", "facade"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tom Wright",
+            "email": "tom@inflatablecookie.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "decodelabs/glitch": "<2",
+
+        "psr/container": "^1.0",
+    },
+    "autoload": {
+        "psr-4": {
+            "DecodeLabs\\Veneer\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "0.x-dev"
+        }
+    }
+}
