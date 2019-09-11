@@ -12,9 +12,7 @@
     ],
     "require": {
         "php": "^7.2",
-        "decodelabs/glitch": "<2",
-
-        "psr/container": "^1.0"
+        "decodelabs/glitch": "<2"
     },
     "autoload": {
         "psr-4": {

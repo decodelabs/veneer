@@ -11,4 +11,7 @@ interface Loader
     public function isRegistered(): bool;
     public function register(): Loader;
     public function unregister(): Loader;
+
+    public function bind(Facade $facade): Loader;
+    public function hasFacade(string $name): bool;
 }
