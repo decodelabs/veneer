@@ -119,7 +119,7 @@ Shortcut the facade binding process with a static call directly to the target cl
 
 ### Plugins
 
-Unfortunately PHP still doesn't have <code>\__getStatic()</code> yet so we have to statically declare plugin names as binding time, but they're still useful for creating more expansive interfaces.
+Unfortunately PHP still doesn't have <code>\__getStatic()</code> yet so we have to statically declare plugin names at binding time, but they're still useful for creating more expansive interfaces.
 
 Define two methods on your <code>FacadeTarget</code>
 
