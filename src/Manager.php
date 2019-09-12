@@ -50,7 +50,7 @@ class Manager
     {
         $this->loader->bind(
             (new Binding($name, $key, true, true))
-                ->extractTargetObject($this->container)
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -63,7 +63,7 @@ class Manager
     {
         $this->loader->bind(
             (new Binding($name, $key, false, true))
-                ->extractTargetObject($this->container)
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -76,7 +76,7 @@ class Manager
     {
         $this->loader->bind(
             (new Binding($name, $key, true))
-                ->extractTargetObject($this->container)
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -89,7 +89,7 @@ class Manager
     {
         $this->loader->bind(
             (new Facade($name, $key, false, false, $namespace))
-                ->extractTargetObject($this->container)
+                ->bindInstance($this->container)
         );
 
         return $this;

@@ -28,35 +28,111 @@ class Binding
         $this->root = $root;
         $this->current = $current;
         $this->namespace = $namespace;
-
-        $this->target = new class() {
-            public static $instance;
-
-            public static function __callStatic(string $name, array $args)
-            {
-                if (!self::$instance) {
-                    \Glitch::ERuntime('No target object has been bound in '.$name.' facade');
-                }
-
-                return (self::$instance)->{$name}(...$args);
-            }
-        };
     }
 
     /**
      * Extract target object
      */
-    public function extractTargetObject(?ContainerInterface $container): Binding
+    public function bindInstance(?ContainerInterface $container): Binding
     {
+        $instance = null;
+
         if ($container && $container->has($this->key)) {
-            ($this->target)::$instance = $container->get($this->key);
+            $instance = $container->get($this->key);
         }
 
-        if (!($this->target)::$instance && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
-            ($this->target)::$instance = new $this->key();
+        if (!$instance && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
+            $class = $this->key;
+            $instance = new $class();
         }
+
+        if (!$instance) {
+            throw \Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+        }
+
+        if ($instance instanceof FacadeTarget) {
+            $pluginNames = $instance->getFacadePluginNames();
+        } else {
+            $pluginNames = [];
+        }
+
+        $this->target = $this->createBindingClass($pluginNames);
+        ($this->target)::$instance = $instance;
+
+        $this->loadPlugins($pluginNames);
 
         return $this;
+    }
+
+    /**
+     * Create binding class
+     */
+    private function createBindingClass(array $pluginNames): Facade
+    {
+        $class = 'return new class() implements '.Facade::class.' { use '.FacadeTrait::class.'; ';
+        $plugins = [];
+
+        foreach ($pluginNames as $name) {
+            $plugins[$name] = 'public static $'.$name.';';
+        }
+
+        $class .= implode(' ', $plugins);
+        $class .= '};';
+
+        return eval($class);
+    }
+
+    /**
+     * Load plugins from target
+     */
+    private function loadPlugins(array $pluginNames): void
+    {
+        foreach ($pluginNames as $name) {
+            ($this->target)::$$name = new class(function () use ($name) {
+                return ($this->target)::$instance->loadFacadePlugin($name);
+            }) {
+                protected static $loader;
+                protected static $plugin;
+
+                public function __construct(callable $loader)
+                {
+                    static::$loader = $loader;
+                }
+
+                public function __get(string $name)
+                {
+                    if (!static::$plugin) {
+                        $this->loadPlugin();
+                    }
+
+                    return static::$plugin->{$name};
+                }
+
+                public function __call(string $name, array $args)
+                {
+                    if (!static::$plugin) {
+                        $this->loadPlugin();
+                    }
+
+                    return static::$plugin->{$name}(...$args);
+                }
+
+                public static function __callStatic(string $name, array $args)
+                {
+                    if (!static::$plugin) {
+                        static::loadPlugin();
+                    }
+
+                    return static::$plugin::{$name}(...$args);
+                }
+
+                private static function loadPlugin()
+                {
+                    $loader = static::$loader;
+                    static::$plugin = $loader();
+                }
+            };
+        }
     }
 
     /**
@@ -104,6 +180,10 @@ class Binding
      */
     public function getTarget(): object
     {
+        if (!$this->target) {
+            throw \Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
+        }
+
         return $this->target;
     }
 }
