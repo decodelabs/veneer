@@ -136,6 +136,7 @@ namespace My\Library
         use FacadeTargetTrait;
 
         public function getFacadePluginNames(): array {
+            // Return the list of plugin names to be accessed from the facade
             return [
                 'plugin1',
                 'plugin2'
