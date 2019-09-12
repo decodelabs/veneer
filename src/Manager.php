@@ -49,8 +49,8 @@ class Manager
     public function bindGlobalFacade(string $name, string $key): Manager
     {
         $this->loader->bind(
-            (new Facade($name, $key, true, true))
-                ->extractTargetObject($this->container)
+            (new Binding($name, $key, true, true))
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -62,8 +62,8 @@ class Manager
     public function bindLocalFacade(string $name, string $key): Manager
     {
         $this->loader->bind(
-            (new Facade($name, $key, false, true))
-                ->extractTargetObject($this->container)
+            (new Binding($name, $key, false, true))
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -75,8 +75,8 @@ class Manager
     public function bindRootFacade(string $name, string $key): Manager
     {
         $this->loader->bind(
-            (new Facade($name, $key, true))
-                ->extractTargetObject($this->container)
+            (new Binding($name, $key, true))
+                ->bindInstance($this->container)
         );
 
         return $this;
@@ -89,7 +89,7 @@ class Manager
     {
         $this->loader->bind(
             (new Facade($name, $key, false, false, $namespace))
-                ->extractTargetObject($this->container)
+                ->bindInstance($this->container)
         );
 
         return $this;

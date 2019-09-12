@@ -15,6 +15,44 @@ trait FacadeTargetTrait
      */
     public static function registerFacade(?ContainerInterface $container=null, ?Manager $veneer=null): ?Manager
     {
+        return self::registerGlobalFacade($container, $veneer);
+    }
+
+    /**
+     * Register as global facade
+     */
+    public static function registerGlobalFacade(?ContainerInterface $container=null, ?Manager $veneer=null): ?Manager
+    {
+        return self::prepareFacadeRegistration($container, $veneer, function ($veneer, $name, $class) {
+            $veneer->bindGlobalFacade($name, $class);
+        });
+    }
+
+    /**
+     * Register as root facade
+     */
+    public static function registerRootFacade(?ContainerInterface $container=null, ?Manager $veneer=null): ?Manager
+    {
+        return self::prepareFacadeRegistration($container, $veneer, function ($veneer, $name, $class) {
+            $veneer->bindRootFacade($name, $class);
+        });
+    }
+
+    /**
+     * Register as root facade
+     */
+    public static function registerLocalFacade(?ContainerInterface $container=null, ?Manager $veneer=null): ?Manager
+    {
+        return self::prepareFacadeRegistration($container, $veneer, function ($veneer, $name, $class) {
+            $veneer->bindLocalFacade($name, $class);
+        });
+    }
+
+    /**
+     * Prepare for facade registration
+     */
+    private static function prepareFacadeRegistration(?ContainerInterface $container=null, ?Manager $veneer=null, callable $callback): ?Manager
+    {
         $class = get_called_class();
 
         if (!defined($class.'::FACADE')) {
@@ -42,9 +80,26 @@ trait FacadeTargetTrait
         }
 
         if (!$veneer->hasFacade($name)) {
-            $veneer->bindGlobalFacade($name, $class);
+            $callback($veneer, $name, $class);
         }
 
         return $veneer;
+    }
+
+
+    /**
+     * Stub to get empty plugin list to avoid broken targets
+     */
+    public function getFacadePluginNames(): array
+    {
+        return [];
+    }
+
+    /**
+     * Stub to avoid broken targets
+     */
+    public function loadFacadePlugin(string $name): FacadePlugin
+    {
+        throw \Glitch::EImplementation('Facade target has not implemented a plugin loader', null, $this);
     }
 }

@@ -1,0 +1,189 @@
+<?php
+/**
+ * This file is part of the Veneer package
+ * @license http://opensource.org/licenses/MIT
+ */
+declare(strict_types=1);
+namespace DecodeLabs\Veneer;
+
+use Psr\Container\ContainerInterface;
+
+class Binding
+{
+    protected $name;
+    protected $key;
+    protected $root = false;
+    protected $current = false;
+    protected $namespace = null;
+
+    protected $target;
+
+    /**
+     * Init with criteria
+     */
+    public function __construct(string $name, string $key, bool $root=false, bool $current=false, string $namespace=null)
+    {
+        $this->name = $name;
+        $this->key = $key;
+        $this->root = $root;
+        $this->current = $current;
+        $this->namespace = $namespace;
+    }
+
+    /**
+     * Extract target object
+     */
+    public function bindInstance(?ContainerInterface $container): Binding
+    {
+        $instance = null;
+
+        if ($container && $container->has($this->key)) {
+            $instance = $container->get($this->key);
+        }
+
+        if (!$instance && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
+            $class = $this->key;
+            $instance = new $class();
+        }
+
+        if (!$instance) {
+            throw \Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+        }
+
+        if ($instance instanceof FacadeTarget) {
+            $pluginNames = $instance->getFacadePluginNames();
+        } else {
+            $pluginNames = [];
+        }
+
+        $this->target = $this->createBindingClass($pluginNames);
+        ($this->target)::$instance = $instance;
+
+        $this->loadPlugins($pluginNames);
+
+        return $this;
+    }
+
+    /**
+     * Create binding class
+     */
+    private function createBindingClass(array $pluginNames): Facade
+    {
+        $class = 'return new class() implements '.Facade::class.' { use '.FacadeTrait::class.'; ';
+        $plugins = [];
+
+        foreach ($pluginNames as $name) {
+            $plugins[$name] = 'public static $'.$name.';';
+        }
+
+        $class .= implode(' ', $plugins);
+        $class .= '};';
+
+        return eval($class);
+    }
+
+    /**
+     * Load plugins from target
+     */
+    private function loadPlugins(array $pluginNames): void
+    {
+        foreach ($pluginNames as $name) {
+            ($this->target)::$$name = new class(function () use ($name) {
+                return ($this->target)::$instance->loadFacadePlugin($name);
+            }) {
+                protected static $loader;
+                protected static $plugin;
+
+                public function __construct(callable $loader)
+                {
+                    static::$loader = $loader;
+                }
+
+                public function __get(string $name)
+                {
+                    if (!static::$plugin) {
+                        $this->loadPlugin();
+                    }
+
+                    return static::$plugin->{$name};
+                }
+
+                public function __call(string $name, array $args)
+                {
+                    if (!static::$plugin) {
+                        $this->loadPlugin();
+                    }
+
+                    return static::$plugin->{$name}(...$args);
+                }
+
+                public static function __callStatic(string $name, array $args)
+                {
+                    if (!static::$plugin) {
+                        static::loadPlugin();
+                    }
+
+                    return static::$plugin::{$name}(...$args);
+                }
+
+                private static function loadPlugin()
+                {
+                    $loader = static::$loader;
+                    static::$plugin = $loader();
+                }
+            };
+        }
+    }
+
+    /**
+     * Get facade name
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get container key
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * Should generate in root?
+     */
+    public function isRoot(): bool
+    {
+        return $this->root;
+    }
+
+    /**
+     * Should generate in current namespace?
+     */
+    public function isCurrent(): bool
+    {
+        return $this->current;
+    }
+
+    /**
+     * Get target namespace
+     */
+    public function getNamespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Get bind target
+     */
+    public function getTarget(): object
+    {
+        if (!$this->target) {
+            throw \Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
+        }
+
+        return $this->target;
+    }
+}

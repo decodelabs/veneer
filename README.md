@@ -82,3 +82,88 @@ namespace Some\Other\Code
 ```
 
 Just make sure you keep track of the Manager object and ensure there's only one instance in use.
+
+
+## Extended functionality
+
+Implement <code>DecodeLabs\Veneer\FacadeTarget</code> to access advanced Facade features.
+
+```php
+namespace My\Library
+{
+    use DecodeLabs\Veneer\FacadeTarget;
+    use DecodeLabs\Veneer\FacadeTargetTrait;
+
+    class MyThing implements FacadeTarget {
+        use FacadeTargetTrait;
+    }
+}
+```
+
+### Binding shortcuts
+
+Shortcut the facade binding process with a static call directly to the target class:
+
+```php
+// Register as global facade
+\My\Library\MyThing::registerFacade($psr11Container ?? null, $veneerManager ?? null);
+\My\Library\MyThing::registerGlobalFacade($psr11Container ?? null, $veneerManager ?? null);
+
+// Register in root namespace only
+\My\Library\MyThing::registerRootFacade($psr11Container ?? null, $veneerManager ?? null);
+
+// Register in current local namespace
+\My\Library\MyThing::registerLocalFacade($psr11Container ?? null, $veneerManager ?? null);
+```
+
+
+### Plugins
+
+Unfortunately PHP still doesn't have <code>\__getStatic()</code> yet so we have to statically declare plugin names as binding time, but they're still useful for creating more expansive interfaces.
+
+Define two methods on your <code>FacadeTarget</code>
+
+
+```php
+namespace My\Library
+{
+    use DecodeLabs\Veneer\FacadeTarget;
+    use DecodeLabs\Veneer\FacadeTargetTrait;
+    use DecodeLabs\Veneer\FacadeTargetPlugin;
+
+    class MyThing implements FacadeTarget {
+
+        use FacadeTargetTrait;
+
+        public function getFacadePluginNames(): array {
+            return [
+                'plugin1',
+                'plugin2'
+            ];
+        }
+
+        public function loadFacadePlugin(string $name): FacadePlugin {
+            // Load plugin object (must implement FacadePlugin)
+
+            // This is just a quick example using anonymous classes:
+            return new class($name) implements FacadeTarget {
+
+                public $name;
+
+                public function __construct(string $name) {
+                    $this->name = $name;
+                }
+
+                public function doAThing() {
+                    echo 'Hello from '.$this->name;
+                }
+            }
+        }
+    }
+}
+
+namespace Some\Other\Code
+{
+    MyThing::$plugin1->doAThing(); // Hello from plugin1
+}
+```

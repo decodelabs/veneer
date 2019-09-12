@@ -6,9 +6,6 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
-use Psr\Container\ContainerInterface;
-
-interface Facade
+interface FacadePlugin
 {
-    public static function __callStatic(string $name, array $args);
 }
