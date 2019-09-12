@@ -8,7 +8,7 @@ namespace DecodeLabs\Veneer;
 
 use Psr\Container\ContainerInterface;
 
-class Facade
+class Binding
 {
     protected $name;
     protected $key;
@@ -30,15 +30,15 @@ class Facade
         $this->namespace = $namespace;
 
         $this->target = new class() {
-            public static $object;
+            public static $instance;
 
             public static function __callStatic(string $name, array $args)
             {
-                if (!self::$object) {
+                if (!self::$instance) {
                     \Glitch::ERuntime('No target object has been bound in '.$name.' facade');
                 }
 
-                return (self::$object)->{$name}(...$args);
+                return (self::$instance)->{$name}(...$args);
             }
         };
     }
@@ -46,14 +46,14 @@ class Facade
     /**
      * Extract target object
      */
-    public function extractTargetObject(?ContainerInterface $container): Facade
+    public function extractTargetObject(?ContainerInterface $container): Binding
     {
         if ($container && $container->has($this->key)) {
-            ($this->target)::$object = $container->get($this->key);
+            ($this->target)::$instance = $container->get($this->key);
         }
 
-        if (!($this->target)::$object && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
-            ($this->target)::$object = new $this->key();
+        if (!($this->target)::$instance && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
+            ($this->target)::$instance = new $this->key();
         }
 
         return $this;

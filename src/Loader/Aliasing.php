@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace DecodeLabs\Veneer\Loader;
 
 use DecodeLabs\Veneer\Loader;
-use DecodeLabs\Veneer\Facade;
+use DecodeLabs\Veneer\Binding;
 
 use Psr\Container\ContainerInterface;
 
@@ -83,7 +83,7 @@ class Aliasing implements Loader
     /**
      * Bind a facade
      */
-    public function bind(Facade $facade): Loader
+    public function bind(Binding $facade): Loader
     {
         $this->facades[$facade->getName()] = $facade;
         return $this;
