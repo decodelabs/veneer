@@ -47,7 +47,7 @@ class Binding
         }
 
         if (!$instance) {
-            throw \Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+            throw Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
         }
 
         if ($instance instanceof FacadeTarget) {
@@ -199,7 +199,7 @@ class Binding
     public function getTarget(): object
     {
         if (!$this->target) {
-            throw \Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
+            throw Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
         }
 
         return $this->target;

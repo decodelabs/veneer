@@ -56,7 +56,7 @@ trait FacadeTargetTrait
         $class = get_called_class();
 
         if (!defined($class.'::FACADE')) {
-            throw \Glitch::ESetup('Facade target '.$class.' has not defined the facade name', null, $class);
+            throw Glitch::ESetup('Facade target '.$class.' has not defined the facade name', null, $class);
         }
 
         $name = $class::FACADE;
@@ -96,6 +96,6 @@ trait FacadeTargetTrait
      */
     public function loadFacadePlugin(string $name): FacadePlugin
     {
-        throw \Glitch::EImplementation('Facade target has not implemented a plugin loader', null, $this);
+        throw Glitch::EImplementation('Facade target has not implemented a plugin loader', null, $this);
     }
 }
