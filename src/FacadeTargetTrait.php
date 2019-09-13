@@ -61,10 +61,6 @@ trait FacadeTargetTrait
 
         $name = $class::FACADE;
 
-        if (class_exists($name)) {
-            return null;
-        }
-
         if (!$veneer) {
             if ($default = Manager::getDefault()) {
                 $veneer = $default;

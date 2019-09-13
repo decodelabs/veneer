@@ -56,7 +56,7 @@ class Binding
             $pluginNames = [];
         }
 
-        $this->target = $this->createBindingClass($pluginNames);
+        $this->target = $this->createBindingClass($instance, $pluginNames);
         ($this->target)::$instance = $instance;
 
         $this->loadPlugins($pluginNames);
@@ -67,18 +67,36 @@ class Binding
     /**
      * Create binding class
      */
-    private function createBindingClass(array $pluginNames): Facade
+    private function createBindingClass($instance, array $pluginNames): Facade
     {
         $class = 'return new class() implements '.Facade::class.' { use '.FacadeTrait::class.'; ';
-        $plugins = [];
+        $plugins = $consts = [];
+        $ref = new \ReflectionClass($instance);
+        $instName = $ref->getName();
+
+        $consts['FACADE'] = 'const FACADE = \''.$this->name.'\';';
+
+        foreach ($ref->getConstants() as $key => $val) {
+            if ($key === 'FACADE') {
+                continue;
+            }
+
+            $consts[$key] = 'const '.$key.' = '.$instName.'::'.$key.';';
+        }
+
+        if (!empty($consts)) {
+            $class .= implode(' ', $consts).' ';
+        }
 
         foreach ($pluginNames as $name) {
             $plugins[$name] = 'public static $'.$name.';';
         }
 
-        $class .= implode(' ', $plugins);
-        $class .= '};';
+        if (!empty($plugins)) {
+            $class .= implode(' ', $plugins).' ';
+        }
 
+        $class .= '};';
         return eval($class);
     }
 
