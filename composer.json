@@ -16,10 +16,10 @@
     },
     "autoload": {
         "psr-4": {
-            "DecodeLabs\\Veneer\\": "src/"
+            "DecodeLabs\\Veneer\\": "src/Veneer"
         },
         "files": [
-            "src/resources/global.php"
+            "src/global.php"
         ]
     },
     "extra": {
