@@ -30,16 +30,23 @@ namespace App\Setup
 {
     // This is your environment setup code
     use DecodeLabs\Veneer\Manager;
+    use DecodeLabs\Veneer\Listener\AutoLoad as Listener;
     use Some\Random\Library\MyThing;
 
     // Use whatever PSR 11 container you want
     $psr11Container = new WhateverContainer();
+
+    // Create and bind your main listener
+    $listener = new Listener();
+    $psr11Container->bind(Listener::class, $listener);
 
     // Bind your instance to your container
     $psr11Container->bind('thing', new MyThing());
 
     // Create a veneer manager
     $manager = new Manager($psr11Container);
+    $psr11Container->bind(Manager::class, $manager);
+    $listener->registerManager($manager);
 
     // Bind the name "CoolThing" to your instance in the container
     $manager->bindGlobalFacade('CoolThing', 'thing');
@@ -58,17 +65,20 @@ namespace Some\Other\Code
 }
 ```
 
-...or directly, without, using the class name as the instance key:
+...or directly, without a container, using the class name as the instance key:
 
 ```php
 namespace App\Setup
 {
     // This is your environment setup code
+    use DecodeLabs\Veneer\Register;
     use DecodeLabs\Veneer\Manager;
+    use DecodeLabs\Veneer\Listener\AutoLoad as Listener;
     use Some\Random\Library\MyThing;
 
     // Create a veneer manager
     $manager = new Manager();
+    Register::getGlobalListener()->registerManager($manager);
 
     // Bind the name "CoolThing" to your instance in the container
     $manager->bindGlobalFacade('CoolThing', MyThing::class);
@@ -81,8 +91,6 @@ namespace Some\Other\Code
 }
 ```
 
-Just make sure you keep track of the Manager object and ensure there's only one instance in use.
-
 
 ## Extended functionality
 
@@ -91,11 +99,21 @@ Implement <code>DecodeLabs\Veneer\FacadeTarget</code> to access advanced Facade 
 ```php
 namespace My\Library
 {
+    use DecodeLabs\Veneer\Manager;
     use DecodeLabs\Veneer\FacadeTarget;
     use DecodeLabs\Veneer\FacadeTargetTrait;
 
     class MyThing implements FacadeTarget {
         use FacadeTargetTrait;
+
+        /**
+         * Optionally define custom binding method
+         * Default is global as below
+         */
+        public static function bindFacade(Manager $manager, string $name, string $class): void
+        {
+            $manager->bindGlobalFacade($name, $class);
+        }
     }
 }
 ```
@@ -106,14 +124,7 @@ Shortcut the facade binding process with a static call directly to the target cl
 
 ```php
 // Register as global facade
-\My\Library\MyThing::registerFacade($psr11Container ?? null, $veneerManager ?? null);
-\My\Library\MyThing::registerGlobalFacade($psr11Container ?? null, $veneerManager ?? null);
-
-// Register in root namespace only
-\My\Library\MyThing::registerRootFacade($psr11Container ?? null, $veneerManager ?? null);
-
-// Register in current local namespace
-\My\Library\MyThing::registerLocalFacade($psr11Container ?? null, $veneerManager ?? null);
+\My\Library\MyThing::registerFacade();
 ```
 
 

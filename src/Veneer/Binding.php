@@ -6,6 +6,7 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
+use DecodeLabs\Glitch\Exception\Factory as Glitch;
 use Psr\Container\ContainerInterface;
 
 class Binding
@@ -62,6 +63,14 @@ class Binding
         $this->loadPlugins($pluginNames);
 
         return $this;
+    }
+
+    /**
+     * Has instance been bound to target
+     */
+    public function hasInstance(): bool
+    {
+        return $this->target !== null;
     }
 
     /**
@@ -199,7 +208,7 @@ class Binding
     public function getTarget(): object
     {
         if (!$this->target) {
-            throw Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
+            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
         }
 
         return $this->target;
