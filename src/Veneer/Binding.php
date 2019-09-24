@@ -6,6 +6,7 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
+use DecodeLabs\Glitch\Exception\Factory as Glitch;
 use Psr\Container\ContainerInterface;
 
 class Binding
@@ -47,7 +48,7 @@ class Binding
         }
 
         if (!$instance) {
-            throw \Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+            throw Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
         }
 
         if ($instance instanceof FacadeTarget) {
@@ -56,7 +57,7 @@ class Binding
             $pluginNames = [];
         }
 
-        $this->target = $this->createBindingClass($pluginNames);
+        $this->target = $this->createBindingClass($instance, $pluginNames);
         ($this->target)::$instance = $instance;
 
         $this->loadPlugins($pluginNames);
@@ -65,20 +66,46 @@ class Binding
     }
 
     /**
+     * Has instance been bound to target
+     */
+    public function hasInstance(): bool
+    {
+        return $this->target !== null;
+    }
+
+    /**
      * Create binding class
      */
-    private function createBindingClass(array $pluginNames): Facade
+    private function createBindingClass($instance, array $pluginNames): Facade
     {
         $class = 'return new class() implements '.Facade::class.' { use '.FacadeTrait::class.'; ';
-        $plugins = [];
+        $plugins = $consts = [];
+        $ref = new \ReflectionClass($instance);
+        $instName = $ref->getName();
+
+        $consts['FACADE'] = 'const FACADE = \''.$this->name.'\';';
+
+        foreach ($ref->getConstants() as $key => $val) {
+            if ($key === 'FACADE') {
+                continue;
+            }
+
+            $consts[$key] = 'const '.$key.' = '.$instName.'::'.$key.';';
+        }
+
+        if (!empty($consts)) {
+            $class .= implode(' ', $consts).' ';
+        }
 
         foreach ($pluginNames as $name) {
             $plugins[$name] = 'public static $'.$name.';';
         }
 
-        $class .= implode(' ', $plugins);
-        $class .= '};';
+        if (!empty($plugins)) {
+            $class .= implode(' ', $plugins).' ';
+        }
 
+        $class .= '};';
         return eval($class);
     }
 
@@ -181,7 +208,7 @@ class Binding
     public function getTarget(): object
     {
         if (!$this->target) {
-            throw \Glitch::ERuntime('Facade has not been bound to target yet', null, $this);
+            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
         }
 
         return $this->target;

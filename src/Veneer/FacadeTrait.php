@@ -18,7 +18,7 @@ trait FacadeTrait
     public static function __callStatic(string $name, array $args)
     {
         if (!self::$instance) {
-            \Glitch::ERuntime('No target object has been bound in '.$name.' facade');
+            Glitch::ERuntime('No target object has been bound in '.$name.' facade');
         }
 
         return (self::$instance)->{$name}(...$args);
