@@ -115,19 +115,22 @@ class Binding
     private function loadPlugins(array $pluginNames): void
     {
         foreach ($pluginNames as $name) {
-            ($this->target)::$$name = new class($name, function (string $name) {
-                return ($this->target)::$instance->loadFacadePlugin($name);
+            ($this->target)::$$name = new class(function () use ($name) {
+                $output = ($this->target)::$instance->loadFacadePlugin($name);
+
+                if (($this->target)::$instance instanceof FacadePluginAccessTarget) {
+                    ($this->target)::$instance->cacheLoadedFacadePlugin($name, $output);
+                }
+
+                return $output;
             }) {
                 const FACADE_PLUGIN = true;
-
-                public static $name;
 
                 protected static $loader;
                 protected static $plugin;
 
-                public function __construct(string $name, callable $loader)
+                public function __construct(callable $loader)
                 {
-                    static::$name = $name;
                     static::$loader = $loader;
                 }
 
@@ -161,7 +164,7 @@ class Binding
                 private static function loadPlugin()
                 {
                     $loader = static::$loader;
-                    static::$plugin = $loader(static::$name);
+                    static::$plugin = $loader();
                 }
             };
         }
