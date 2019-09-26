@@ -9,6 +9,10 @@ namespace DecodeLabs\Veneer;
 use DecodeLabs\Glitch\Exception\Factory as Glitch;
 use Psr\Container\ContainerInterface;
 
+use DecodeLabs\Glitch\Inspectable;
+use DecodeLabs\Glitch\Dumper\Entity;
+use DecodeLabs\Glitch\Dumper\Inspector;
+
 class Binding
 {
     protected $name;
@@ -123,7 +127,7 @@ class Binding
                 }
 
                 return $output;
-            }) {
+            }) implements Inspectable {
                 const FACADE_PLUGIN = true;
 
                 protected $loader;
@@ -156,6 +160,22 @@ class Binding
                 {
                     $loader = $this->loader;
                     $this->plugin = $loader();
+                }
+
+
+                /**
+                 * Inspect for Glitch
+                 */
+                public function glitchInspect(Entity $entity, Inspector $inspector): void
+                {
+                    if (!$this->plugin) {
+                        $this->loadPlugin();
+                    }
+
+                    $entity
+                        ->setClass('PluginWrapper')
+                        ->setValues([$inspector($this->plugin)])
+                        ->setShowKeys(false);
                 }
             };
         }
