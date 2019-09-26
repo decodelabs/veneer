@@ -1,5 +1,6 @@
 ## v0.4.0 (2019-09-26)
 * Fixed multiple plugin binding namespacing
+* Added dump handling to plugins
 
 ## v0.3.0 (2019-09-24)
 * Moved autoload code to Listener structure
