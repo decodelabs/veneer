@@ -126,45 +126,36 @@ class Binding
             }) {
                 const FACADE_PLUGIN = true;
 
-                protected static $loader;
-                protected static $plugin;
+                protected $loader;
+                protected $plugin;
 
                 public function __construct(callable $loader)
                 {
-                    static::$loader = $loader;
+                    $this->loader = $loader;
                 }
 
                 public function __get(string $name)
                 {
-                    if (!static::$plugin) {
+                    if (!$this->plugin) {
                         $this->loadPlugin();
                     }
 
-                    return static::$plugin->{$name};
+                    return $this->plugin->{$name};
                 }
 
                 public function __call(string $name, array $args)
                 {
-                    if (!static::$plugin) {
+                    if (!$this->plugin) {
                         $this->loadPlugin();
                     }
 
-                    return static::$plugin->{$name}(...$args);
+                    return $this->plugin->{$name}(...$args);
                 }
 
-                public static function __callStatic(string $name, array $args)
+                private function loadPlugin()
                 {
-                    if (!static::$plugin) {
-                        static::loadPlugin();
-                    }
-
-                    return static::$plugin::{$name}(...$args);
-                }
-
-                private static function loadPlugin()
-                {
-                    $loader = static::$loader;
-                    static::$plugin = $loader();
+                    $loader = $this->loader;
+                    $this->plugin = $loader();
                 }
             };
         }
