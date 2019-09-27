@@ -10,7 +10,7 @@ use Psr\Container\ContainerInterface;
 
 interface FacadeTarget
 {
-    public static function registerFacade(): void;
+    public static function registerFacade(string ...$autoBind): void;
     public static function bindFacade(Manager $manager, string $name, string $class): void;
 
     public function getFacadePluginNames(): array;

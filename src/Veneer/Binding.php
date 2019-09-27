@@ -9,6 +9,10 @@ namespace DecodeLabs\Veneer;
 use DecodeLabs\Glitch\Exception\Factory as Glitch;
 use Psr\Container\ContainerInterface;
 
+use DecodeLabs\Glitch\Inspectable;
+use DecodeLabs\Glitch\Dumper\Entity;
+use DecodeLabs\Glitch\Dumper\Inspector;
+
 class Binding
 {
     protected $name;
@@ -116,47 +120,62 @@ class Binding
     {
         foreach ($pluginNames as $name) {
             ($this->target)::$$name = new class(function () use ($name) {
-                return ($this->target)::$instance->loadFacadePlugin($name);
-            }) {
-                protected static $loader;
-                protected static $plugin;
+                $output = ($this->target)::$instance->loadFacadePlugin($name);
+
+                if (($this->target)::$instance instanceof FacadePluginAccessTarget) {
+                    ($this->target)::$instance->cacheLoadedFacadePlugin($name, $output);
+                }
+
+                return $output;
+            }) implements Inspectable {
+                const FACADE_PLUGIN = true;
+
+                protected $loader;
+                protected $plugin;
 
                 public function __construct(callable $loader)
                 {
-                    static::$loader = $loader;
+                    $this->loader = $loader;
                 }
 
                 public function __get(string $name)
                 {
-                    if (!static::$plugin) {
+                    if (!$this->plugin) {
                         $this->loadPlugin();
                     }
 
-                    return static::$plugin->{$name};
+                    return $this->plugin->{$name};
                 }
 
                 public function __call(string $name, array $args)
                 {
-                    if (!static::$plugin) {
+                    if (!$this->plugin) {
                         $this->loadPlugin();
                     }
 
-                    return static::$plugin->{$name}(...$args);
+                    return $this->plugin->{$name}(...$args);
                 }
 
-                public static function __callStatic(string $name, array $args)
+                private function loadPlugin()
                 {
-                    if (!static::$plugin) {
-                        static::loadPlugin();
+                    $loader = $this->loader;
+                    $this->plugin = $loader();
+                }
+
+
+                /**
+                 * Inspect for Glitch
+                 */
+                public function glitchInspect(Entity $entity, Inspector $inspector): void
+                {
+                    if (!$this->plugin) {
+                        $this->loadPlugin();
                     }
 
-                    return static::$plugin::{$name}(...$args);
-                }
-
-                private static function loadPlugin()
-                {
-                    $loader = static::$loader;
-                    static::$plugin = $loader();
+                    $entity
+                        ->setClass('PluginWrapper')
+                        ->setValues([$inspector($this->plugin)])
+                        ->setShowKeys(false);
                 }
             };
         }

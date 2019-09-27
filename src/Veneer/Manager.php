@@ -16,4 +16,5 @@ interface Manager
     public function prepareFacade(string $name): ?Binding;
 
     public function load(string $name, ?string $namespace): bool;
+    public function loadManual(string $name, string $className): bool;
 }

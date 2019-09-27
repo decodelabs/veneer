@@ -179,3 +179,7 @@ namespace Some\Other\Code
     MyThing::$plugin1->doAThing(); // Hello from plugin1
 }
 ```
+
+
+## Licensing
+Veneer is licensed under the MIT License. See [LICENSE](./LICENSE) for the full license text.
