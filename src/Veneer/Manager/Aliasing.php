@@ -51,4 +51,22 @@ class Aliasing implements Manager
 
         return $output;
     }
+
+    /**
+     * Manually load an alias against the name
+     */
+    public function loadManual(string $name, string $className): bool
+    {
+        if (!$facade = $this->prepareFacade($name)) {
+            return false;
+        }
+
+        if (class_exists($className, false)) {
+            return false;
+        }
+
+        $facadeClass = get_class($facade->getTarget());
+        class_alias($facadeClass, $className);
+        return true;
+    }
 }

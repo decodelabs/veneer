@@ -1,3 +1,6 @@
+## v0.5.0 (2019-09-27)
+* Added manual class alias loader on binding instantiation
+
 ## v0.4.0 (2019-09-26)
 * Fixed multiple plugin binding namespacing
 * Added dump handling to plugins

@@ -14,7 +14,7 @@ trait FacadeTargetTrait
     /**
      * Register as Veneer facade
      */
-    public static function registerFacade(): void
+    public static function registerFacade(string ...$autoBind): void
     {
         $class = get_called_class();
 
@@ -27,6 +27,10 @@ trait FacadeTargetTrait
 
         if (!$manager->hasFacade($name)) {
             self::bindFacade($manager, $name, $class);
+        }
+
+        foreach ($autoBind as $className) {
+            $manager->loadManual($name, $className);
         }
     }
 
