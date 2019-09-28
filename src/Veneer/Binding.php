@@ -173,7 +173,7 @@ class Binding
                     }
 
                     $entity
-                        ->setClass('PluginWrapper')
+                        ->setClassName('@PluginWrapper')
                         ->setValues([$inspector($this->plugin)])
                         ->setShowKeys(false);
                 }
