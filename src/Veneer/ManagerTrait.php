@@ -57,7 +57,7 @@ trait ManagerTrait
      */
     public function bindNamespaceFacade(string $name, string $key, string $namespace): Manager
     {
-        $binding = new Facade($name, $key, false, false, $namespace);
+        $binding = new Binding($name, $key, false, false, $namespace);
         $this->facades[$binding->getName()] = $binding;
         return $this;
     }
