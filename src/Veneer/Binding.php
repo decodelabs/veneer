@@ -52,7 +52,7 @@ class Binding
         }
 
         if (!$instance) {
-            throw Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+            throw Glitch::ERuntime('Could not get instance of '.$this->key.' to bind to', null, $this);
         }
 
         if ($instance instanceof FacadeTarget) {
