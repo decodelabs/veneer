@@ -1,0 +1,6 @@
+includes:
+    - ./vendor/decodelabs/phpstan-decodelabs/extension.neon
+parameters:
+    level: max
+    ignoreErrors:
+        - '#Access to an undefined static property DecodeLabs\\Veneer\\Facade::\$instance#'

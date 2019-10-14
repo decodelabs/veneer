@@ -1,3 +1,0 @@
-parameters:
-    ignoreErrors:
-        - '#^Call to an undefined static method (.+)src/Veneer/Binding\.php(.+)::E[A-Z][a-zA-Z0-9]+\(\)#'
