@@ -10,12 +10,6 @@
             "email": "tom@inflatablecookie.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:decodelabs/phpstan-decodelabs.git"
-        }
-    ],
     "require": {
         "php": "^7.2",
         "decodelabs/glitch": "<2"
