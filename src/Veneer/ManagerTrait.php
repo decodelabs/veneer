@@ -57,7 +57,7 @@ trait ManagerTrait
      */
     public function bindNamespaceFacade(string $name, string $key, string $namespace): Manager
     {
-        $binding = new Facade($name, $key, false, false, $namespace);
+        $binding = new Binding($name, $key, false, false, $namespace);
         $this->facades[$binding->getName()] = $binding;
         return $this;
     }
@@ -70,6 +70,21 @@ trait ManagerTrait
         return isset($this->facades[$name]);
     }
 
+    /**
+     * Has facade been bound with plugin?
+     */
+    public function hasFacadePlugin(string $facadeName, string $pluginName): bool
+    {
+        if (!$facade = ($this->facades[$facadeName] ?? null)) {
+            return false;
+        }
+
+        if (!$facade->hasInstance()) {
+            $facade->bindInstance($this->container);
+        }
+
+        return $facade->hasPlugin($pluginName);
+    }
 
     /**
      * Prepare binding facade and ensure instance has been bound
@@ -85,5 +100,23 @@ trait ManagerTrait
         }
 
         return $facade;
+    }
+
+    /**
+     * Get all facade bindings
+     */
+    public function getFacades(): array
+    {
+        $output = [];
+
+        foreach ($this->facades as $name => $facade) {
+            if (!$facade->hasInstance()) {
+                $facade->bindInstance($this->container);
+            }
+
+            $output[$name] = $facade;
+        }
+
+        return $output;
     }
 }

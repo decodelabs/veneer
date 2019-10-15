@@ -1,3 +1,8 @@
+## v0.4.1 (2019-10-15)
+* Updated binding dump handling
+* Added PHPStan support
+* Bugfixes from PHPStan max scan
+
 ## v0.4.0 (2019-09-26)
 * Fixed multiple plugin binding namespacing
 * Added dump handling to plugins

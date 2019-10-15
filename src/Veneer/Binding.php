@@ -22,6 +22,7 @@ class Binding
     protected $namespace = null;
 
     protected $target;
+    protected $pluginNames = [];
 
     /**
      * Init with criteria
@@ -52,19 +53,19 @@ class Binding
         }
 
         if (!$instance) {
-            throw Glitch::ERuntime('Could not get instance of '.$key.' to bind to', null, $this);
+            throw Glitch::ERuntime('Could not get instance of '.$this->key.' to bind to', null, $this);
         }
 
         if ($instance instanceof FacadeTarget) {
-            $pluginNames = $instance->getFacadePluginNames();
+            $this->pluginNames = $instance->getFacadePluginNames();
         } else {
-            $pluginNames = [];
+            $this->pluginNames = [];
         }
 
-        $this->target = $this->createBindingClass($instance, $pluginNames);
+        $this->target = $this->createBindingClass($instance, $this->pluginNames);
         ($this->target)::$instance = $instance;
 
-        $this->loadPlugins($pluginNames);
+        $this->loadPlugins($this->pluginNames);
 
         return $this;
     }
@@ -173,9 +174,8 @@ class Binding
                     }
 
                     $entity
-                        ->setClass('PluginWrapper')
-                        ->setValues([$inspector($this->plugin)])
-                        ->setShowKeys(false);
+                        ->setClassName('@PluginWrapper')
+                        ->setSingleValue($inspector($this->plugin));
                 }
             };
         }
@@ -231,5 +231,29 @@ class Binding
         }
 
         return $this->target;
+    }
+
+    /**
+     * Get plugin names
+     */
+    public function getPluginNames(): array
+    {
+        if (!$this->target) {
+            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
+        }
+
+        return $this->pluginNames;
+    }
+
+    /**
+     * Has plugin by name
+     */
+    public function hasPlugin(string $name): bool
+    {
+        if (!$this->target) {
+            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
+        }
+
+        return in_array($name, $this->pluginNames);
     }
 }
