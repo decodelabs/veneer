@@ -101,4 +101,22 @@ trait ManagerTrait
 
         return $facade;
     }
+
+    /**
+     * Get all facade bindings
+     */
+    public function getFacades(): array
+    {
+        $output = [];
+
+        foreach ($this->facades as $name => $facade) {
+            if (!$facade->hasInstance()) {
+                $facade->bindInstance($this->container);
+            }
+
+            $output[$name] = $facade;
+        }
+
+        return $output;
+    }
 }
