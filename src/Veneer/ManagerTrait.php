@@ -70,6 +70,21 @@ trait ManagerTrait
         return isset($this->facades[$name]);
     }
 
+    /**
+     * Has facade been bound with plugin?
+     */
+    public function hasFacadePlugin(string $facadeName, string $pluginName): bool
+    {
+        if (!$facade = ($this->facades[$facadeName] ?? null)) {
+            return null;
+        }
+
+        if (!$facade->hasInstance()) {
+            $facade->bindInstance($this->container);
+        }
+
+        return $facade->hasPlugin($pluginName);
+    }
 
     /**
      * Prepare binding facade and ensure instance has been bound
