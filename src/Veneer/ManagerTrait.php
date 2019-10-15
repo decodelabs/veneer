@@ -76,7 +76,7 @@ trait ManagerTrait
     public function hasFacadePlugin(string $facadeName, string $pluginName): bool
     {
         if (!$facade = ($this->facades[$facadeName] ?? null)) {
-            return null;
+            return false;
         }
 
         if (!$facade->hasInstance()) {
