@@ -4,6 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/veneer.svg?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 [![Build Status](https://img.shields.io/travis/decodelabs/veneer/develop.svg?style=flat-square)](https://travis-ci.org/decodelabs/veneer)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat-square)](https://github.com/phpstan/phpstan)
+[![License](https://img.shields.io/packagist/l/decodelabs/veneer?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 
 Create automated static Facades for your PHP objects via any PSR-11 container.
 
