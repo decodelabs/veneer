@@ -129,4 +129,18 @@ class Context implements FacadeTarget
     {
         return Register::getGlobalListener()->getListedNamespaces();
     }
+
+    /**
+     * Get active target object for Facade
+     */
+    public function get(string $name)
+    {
+        foreach ($this->getManagers() as $manager) {
+            if ($facade = $manager->prepareFacade($name)) {
+                return ($facade->getTarget($name))::$instance;
+            }
+        }
+
+        throw Glitch::EInvalidArgument($name.' has not been bound as a Facade');
+    }
 }
