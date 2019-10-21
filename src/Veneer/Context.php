@@ -88,4 +88,45 @@ class Context implements FacadeTarget
     {
         return Register::getGlobalListener()->getBlacklistedNamespaces();
     }
+
+    /**
+     * Add namespace to the whitelist
+     */
+    public function whitelistNamespaces(string ...$namespaces): Context
+    {
+        Register::getGlobalListener()->whitelistNamespaces(...$namespaces);
+        return $this;
+    }
+
+    /**
+     * Check if namespace has been whitelisted
+     */
+    public function isNamespaceWhitelisted(string $namespace): bool
+    {
+        return Register::getGlobalListener()->isNamespaceWhitelisted($namespace);
+    }
+
+    /**
+     * Get list of whitelisted namespaces
+     */
+    public function getWhitelistedNamespaces(): array
+    {
+        return Register::getGlobalListener()->getWhitelistedNamespaces();
+    }
+
+    /**
+     * Check if namespace has been blacklisted or whitelisted
+     */
+    public function isNamespaceListed(string $namespace): bool
+    {
+        return Register::getGlobalListener()->isNamespaceListed($namespace);
+    }
+
+    /**
+     * Get all listed namespaces
+     */
+    public function getListedNamespaces(): array
+    {
+        return Register::getGlobalListener()->getListedNamespaces();
+    }
 }

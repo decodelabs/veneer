@@ -48,12 +48,17 @@ class Autoload implements Listener
             if ($namespace !== null) {
                 do {
                     $testNs = implode('\\', $parts);
+                    array_pop($parts);
 
-                    if (isset($this->namespaceBlacklist[$testNs])) {
-                        return;
+                    if (!isset($this->namespaces[$testNs])) {
+                        continue;
                     }
 
-                    array_pop($parts);
+                    if ($this->namespaces[$testNs]) {
+                        break;
+                    } else {
+                        return;
+                    }
                 } while (!empty($parts));
             }
 

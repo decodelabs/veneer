@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 trait ListenerTrait
 {
     protected $managers = [];
-    protected $namespaceBlacklist = [];
+    protected $namespaces = [];
 
     /**
      * Register manager instance
@@ -74,7 +74,7 @@ trait ListenerTrait
     {
         foreach ($namespaces as $namespace) {
             $namespace = ltrim($namespace, '\\');
-            $this->namespaceBlacklist[$namespace] = true;
+            $this->namespaces[$namespace] = false;
         }
 
         return $this;
@@ -85,7 +85,7 @@ trait ListenerTrait
      */
     public function isNamespaceBlacklisted(string $namespace): bool
     {
-        return isset($this->namespaceBlacklist[$namespace]);
+        return isset($this->namespaces[$namespace]) && $this->namespaces[$namespace] === false;
     }
 
     /**
@@ -93,6 +93,67 @@ trait ListenerTrait
      */
     public function getBlacklistedNamespaces(): array
     {
-        return $this->namespaceBlacklist;
+        $output = [];
+
+        foreach ($this->namespaces as $namespace => $accept) {
+            if (!$accept) {
+                $output[] = $namespace;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Add namespace to the whitelist
+     */
+    public function whitelistNamespaces(string ...$namespaces): Listener
+    {
+        foreach ($namespaces as $namespace) {
+            $namespace = ltrim($namespace, '\\');
+            $this->namespaces[$namespace] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if namespace has been whitelisted
+     */
+    public function isNamespaceWhitelisted(string $namespace): bool
+    {
+        return isset($this->namespaces[$namespace]) && $this->namespaces[$namespace] === true;
+    }
+
+    /**
+     * Get list of whitelisted namespaces
+     */
+    public function getWhitelistedNamespaces(): array
+    {
+        $output = [];
+
+        foreach ($this->namespaces as $namespace => $accept) {
+            if ($accept) {
+                $output[] = $namespace;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Check if namespace has been blacklisted or whitelisted
+     */
+    public function isNamespaceListed(string $namespace): bool
+    {
+        return isset($this->namespaces[$namespace]);
+    }
+
+    /**
+     * Get all listed namespaces
+     */
+    public function getListedNamespaces(): array
+    {
+        return $this->namespaces;
     }
 }
