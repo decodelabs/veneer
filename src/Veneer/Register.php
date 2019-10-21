@@ -27,6 +27,8 @@ final class Register
                 self::$instance->unregisterManager($manager);
                 $listener->registerManager($manager);
             }
+
+            $listener->blacklistNamespaces(...self::$instance->getBlacklistedNamespaces());
         }
 
         self::$instance = $listener;

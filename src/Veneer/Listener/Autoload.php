@@ -46,6 +46,18 @@ class Autoload implements Listener
             $namespace = empty($parts) ? null : implode('\\', $parts);
 
             if ($namespace !== null) {
+                do {
+                    $testNs = implode('\\', $parts);
+
+                    if (isset($this->namespaceBlacklist[$testNs])) {
+                        return;
+                    }
+
+                    array_pop($parts);
+                } while (!empty($parts));
+            }
+
+            if ($namespace !== null) {
                 $frame = Frame::create(2);
 
                 if (

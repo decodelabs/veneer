@@ -12,6 +12,7 @@ use Psr\Container\ContainerInterface;
 trait ListenerTrait
 {
     protected $managers = [];
+    protected $namespaceBlacklist = [];
 
     /**
      * Register manager instance
@@ -62,5 +63,36 @@ trait ListenerTrait
                 return $manager;
             }
         }
+    }
+
+
+
+    /**
+     * Add namespace to the blacklist
+     */
+    public function blacklistNamespaces(string ...$namespaces): Listener
+    {
+        foreach ($namespaces as $namespace) {
+            $namespace = ltrim($namespace, '\\');
+            $this->namespaceBlacklist[$namespace] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if namespace has been blacklisted
+     */
+    public function isNamespaceBlacklisted(string $namespace): bool
+    {
+        return isset($this->namespaceBlacklist[$namespace]);
+    }
+
+    /**
+     * Get list of blacklisted namespaces
+     */
+    public function getBlacklistedNamespaces(): array
+    {
+        return $this->namespaceBlacklist;
     }
 }
