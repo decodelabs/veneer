@@ -1,3 +1,10 @@
+## v0.5.0 (2019-10-26)
+* Added namespace white / black list
+* Added facade instance getter
+* Added shared Veneer context facade
+* Removed class_exists workaround
+* Improved PHPStan setup
+
 ## v0.4.1 (2019-10-15)
 * Updated binding dump handling
 * Added PHPStan support

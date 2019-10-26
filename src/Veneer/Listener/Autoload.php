@@ -46,15 +46,20 @@ class Autoload implements Listener
             $namespace = empty($parts) ? null : implode('\\', $parts);
 
             if ($namespace !== null) {
-                $frame = Frame::create(2);
+                do {
+                    $testNs = implode('\\', $parts);
+                    array_pop($parts);
 
-                if (
-                    $frame->getType() == 'globalFunction' &&
-                    in_array($frame->getFunctionName(), ['class_exists', 'interface_exists', 'trait_exists']) &&
-                    !defined('__PHPSTAN_RUNNING__')
-                ) {
-                    return;
-                }
+                    if (!isset($this->namespaces[$testNs])) {
+                        continue;
+                    }
+
+                    if ($this->namespaces[$testNs]) {
+                        break;
+                    } else {
+                        return;
+                    }
+                } while (!empty($parts));
             }
 
             foreach ($this->managers as $manager) {

@@ -11,10 +11,19 @@ interface Listener
     public function startListening(): void;
     public function stopListening(): void;
     public function isListening(): bool;
-    
+
     public function registerManager(Manager $manager): void;
     public function unregisterManager(Manager $manager): void;
     public function hasManager(Manager $manager): bool;
     public function getManagers(): array;
     public function getDefaultManager(): Manager;
+
+    public function blacklistNamespaces(string ...$namespaces): Listener;
+    public function isNamespaceBlacklisted(string $namespace): bool;
+    public function getBlacklistedNamespaces(): array;
+    public function whitelistNamespaces(string ...$namespaces): Listener;
+    public function isNamespaceWhitelisted(string $namespace): bool;
+    public function getWhitelistedNamespaces(): array;
+    public function isNamespaceListed(string $namespace): bool;
+    public function getListedNamespaces(): array;
 }
