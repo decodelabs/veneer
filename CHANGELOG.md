@@ -1,3 +1,6 @@
+## v0.5.1 (2020-09-24)
+* Updated Composer dependency handling
+
 ## v0.5.0 (2019-10-26)
 * Added namespace white / black list
 * Added facade instance getter
