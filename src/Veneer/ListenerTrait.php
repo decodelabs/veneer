@@ -62,6 +62,8 @@ trait ListenerTrait
             foreach ($this->managers as $manager) {
                 return $manager;
             }
+
+            throw Glitch::ERuntime('No default manager available');
         }
     }
 
