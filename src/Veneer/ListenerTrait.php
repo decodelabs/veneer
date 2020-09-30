@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Veneer\Manager\Aliasing;
+use DecodeLabs\Exceptional;
+
 use Psr\Container\ContainerInterface;
 
 trait ListenerTrait
@@ -63,7 +65,9 @@ trait ListenerTrait
                 return $manager;
             }
 
-            throw Glitch::ERuntime('No default manager available');
+            throw Exceptional::Runtime(
+                'No default manager available'
+            );
         }
     }
 

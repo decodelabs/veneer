@@ -6,10 +6,10 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
-use DecodeLabs\Glitch\Exception\Factory as Glitch;
-use Psr\Container\ContainerInterface;
-
 use DecodeLabs\Glitch\Dumpable;
+use DecodeLabs\Exceptional;
+
+use Psr\Container\ContainerInterface;
 
 class Binding
 {
@@ -51,7 +51,9 @@ class Binding
         }
 
         if (!$instance) {
-            throw Glitch::ERuntime('Could not get instance of '.$this->key.' to bind to', null, $this);
+            throw Exceptional::Runtime(
+                'Could not get instance of '.$this->key.' to bind to', null, $this
+            );
         }
 
         if ($instance instanceof FacadeTarget) {
@@ -224,7 +226,9 @@ class Binding
     public function getTarget(): object
     {
         if (!$this->target) {
-            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
+            throw Exceptional::Runtime(
+                'Facade '.$this->name.' has not been bound to target yet', null, $this
+            );
         }
 
         return $this->target;
@@ -236,7 +240,9 @@ class Binding
     public function getPluginNames(): array
     {
         if (!$this->target) {
-            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
+            throw Exceptional::Runtime(
+                'Facade '.$this->name.' has not been bound to target yet', null, $this
+            );
         }
 
         return $this->pluginNames;
@@ -248,7 +254,9 @@ class Binding
     public function hasPlugin(string $name): bool
     {
         if (!$this->target) {
-            throw Glitch::ERuntime('Facade '.$this->name.' has not been bound to target yet', null, $this);
+            throw Exceptional::Runtime(
+                'Facade '.$this->name.' has not been bound to target yet', null, $this
+            );
         }
 
         return in_array($name, $this->pluginNames);
