@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Veneer\Register;
+use DecodeLabs\Exceptional;
+
 use Psr\Container\ContainerInterface;
 
 trait FacadeTargetTrait
@@ -19,7 +21,9 @@ trait FacadeTargetTrait
         $class = get_called_class();
 
         if (!defined($class.'::FACADE')) {
-            throw Glitch::ESetup('Facade target '.$class.' has not defined the facade name', null, $class);
+            throw Exceptional::Setup(
+                'Facade target '.$class.' has not defined the facade name', null, $class
+            );
         }
 
         $name = $class::FACADE;
@@ -57,6 +61,8 @@ trait FacadeTargetTrait
      */
     public function loadFacadePlugin(string $name): FacadePlugin
     {
-        throw Glitch::EImplementation('Facade target has not implemented a plugin loader', null, $this);
+        throw Exceptional::Implementation(
+            'Facade target has not implemented a plugin loader', null, $this
+        );
     }
 }

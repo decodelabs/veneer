@@ -14,7 +14,7 @@ use DecodeLabs\Veneer\Register;
 use DecodeLabs\Veneer\Listener;
 use DecodeLabs\Veneer\Listener\Autoload;
 
-use DecodeLabs\Glitch\Exception\Factory as Glitch;
+use DecodeLabs\Exceptional;
 
 class Context implements FacadeTarget
 {
@@ -141,6 +141,8 @@ class Context implements FacadeTarget
             }
         }
 
-        throw Glitch::EInvalidArgument($name.' has not been bound as a Facade');
+        throw Exceptional::InvalidArgument(
+            $name.' has not been bound as a Facade'
+        );
     }
 }
