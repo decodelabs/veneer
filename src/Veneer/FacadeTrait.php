@@ -6,7 +6,7 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
-use Psr\Container\ContainerInterface;
+use DecodeLabs\Exceptional;
 
 trait FacadeTrait
 {
@@ -18,7 +18,9 @@ trait FacadeTrait
     public static function __callStatic(string $name, array $args)
     {
         if (!self::$instance) {
-            Glitch::ERuntime('No target object has been bound in '.$name.' facade');
+            throw Exceptional::Runtime(
+                'No target object has been bound in '.$name.' facade'
+            );
         }
 
         return (self::$instance)->{$name}(...$args);
