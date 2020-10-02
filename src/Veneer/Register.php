@@ -9,8 +9,6 @@ namespace DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Listener;
 use DecodeLabs\Veneer\Listener\Autoload;
 
-use DecodeLabs\Glitch\Exception\Factory as Glitch;
-
 final class Register
 {
     public static $instance;
