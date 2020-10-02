@@ -12,14 +12,14 @@
         "php": "^7.2",
 
         "decodelabs/exceptional": "^0.2",
-        "decodelabs/glitch-support": "^0.1.4",
+        "decodelabs/glitch-support": "^0.2",
 
         "psr/container": "^1"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",
         "phpstan/phpstan": "^0.12.45",
-        "decodelabs/phpstan-decodelabs": "^0.3.4"
+        "decodelabs/phpstan-decodelabs": "^0.3.5"
     },
     "autoload": {
         "psr-4": {
