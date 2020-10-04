@@ -12,7 +12,6 @@ use DecodeLabs\Veneer\Manager\Aliasing as AliasingManager;
 final class Veneer
 {
     protected static $defaultManager;
-    protected static $cacheBindings = false;
 
     /**
      * Set default manager
@@ -64,14 +63,10 @@ final class Veneer
      */
     public static function shouldCacheBindings(): bool
     {
-        return self::$cacheBindings;
-    }
+        if (defined('__PHPSTAN_RUNNING__')) {
+            return true;
+        }
 
-    /**
-     * Set cache bindings
-     */
-    public static function setCacheBindings(bool $cache): void
-    {
-        self::$cacheBindings = $cache;
+        return false;
     }
 }
