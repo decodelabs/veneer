@@ -1,3 +1,6 @@
+## v0.6.1 (2020-10-04)
+* Fixed cached binding support for PHPStan
+
 ## v0.6.0 (2020-10-04)
 * Restructured main library classes
 * Simplified proxy registration

@@ -19,7 +19,7 @@
     "require-dev": {
         "phpunit/phpunit": "^8",
         "phpstan/phpstan": "^0.12.45",
-        "decodelabs/phpstan-decodelabs": "^0.3.8"
+        "decodelabs/phpstan-decodelabs": "^0.3.10"
     },
     "autoload": {
         "psr-4": {
