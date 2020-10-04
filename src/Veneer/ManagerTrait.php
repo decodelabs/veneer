@@ -10,7 +10,7 @@ use Psr\Container\ContainerInterface;
 
 trait ManagerTrait
 {
-    protected $facades = [];
+    protected $bindings = [];
     protected $container;
 
     /**
@@ -23,98 +23,68 @@ trait ManagerTrait
 
 
     /**
-     * Add global alias that can be used --anywhere--
-     */
-    public function bindGlobalFacade(string $name, string $key): Manager
-    {
-        $binding = new Binding($name, $key, true, true);
-        $this->facades[$binding->getName()] = $binding;
-        return $this;
-    }
-
-    /**
-     * Add local alias that can be used in root namespace
-     */
-    public function bindLocalFacade(string $name, string $key): Manager
-    {
-        $binding = new Binding($name, $key, false, true);
-        $this->facades[$binding->getName()] = $binding;
-        return $this;
-    }
-
-    /**
      * Add alias that can be used from root namespace
      */
-    public function bindRootFacade(string $name, string $key): Manager
+    public function bind(string $name, string $key): Manager
     {
-        $binding = new Binding($name, $key, true);
-        $this->facades[$binding->getName()] = $binding;
+        $binding = new Binding($name, $key);
+        $this->bindings[$binding->getName()] = $binding;
         return $this;
     }
 
     /**
-     * Add alias to specific namespace
+     * Has class been bound?
      */
-    public function bindNamespaceFacade(string $name, string $key, string $namespace): Manager
+    public function has(string $name): bool
     {
-        $binding = new Binding($name, $key, false, false, $namespace);
-        $this->facades[$binding->getName()] = $binding;
-        return $this;
+        return isset($this->bindings[$name]);
     }
 
     /**
-     * Has facade been bound?
+     * Has class been bound with plugin?
      */
-    public function hasFacade(string $name): bool
+    public function hasPlugin(string $bindName, string $pluginName): bool
     {
-        return isset($this->facades[$name]);
-    }
-
-    /**
-     * Has facade been bound with plugin?
-     */
-    public function hasFacadePlugin(string $facadeName, string $pluginName): bool
-    {
-        if (!$facade = ($this->facades[$facadeName] ?? null)) {
+        if (!$binding = ($this->bindings[$bindName] ?? null)) {
             return false;
         }
 
-        if (!$facade->hasInstance()) {
-            $facade->bindInstance($this->container);
+        if (!$binding->hasInstance()) {
+            $binding->bindInstance($this->container);
         }
 
-        return $facade->hasPlugin($pluginName);
+        return $binding->hasPlugin($pluginName);
     }
 
     /**
-     * Prepare binding facade and ensure instance has been bound
+     * Prepare binding and ensure instance has been bound
      */
-    public function prepareFacade(string $name): ?Binding
+    public function prepare(string $name): ?Binding
     {
-        if (!$facade = ($this->facades[$name] ?? null)) {
+        if (!$binding = ($this->bindings[$name] ?? null)) {
             return null;
         }
 
-        if (!$facade->hasInstance()) {
-            $facade->bindInstance($this->container);
+        if (!$binding->hasInstance()) {
+            $binding->bindInstance($this->container);
         }
 
-        return $facade;
+        return $binding;
     }
 
     /**
-     * Get all facade bindings
+     * Get all bindings
      */
-    public function getFacades(): array
+    public function getBindings(): array
     {
         $output = [];
 
-        foreach ($this->facades as $name => $facade) {
-            if (!$facade->hasInstance()) {
-                $facade->bindInstance($this->container);
+        foreach ($this->bindings as $name => $binding) {
+            if (!$binding->hasInstance()) {
+                $binding->bindInstance($this->container);
             }
 
-            $output[$name] = $facade;
+            $output[$name] = $binding;
         }
 
         return $output;

@@ -8,15 +8,11 @@ namespace DecodeLabs\Veneer;
 
 interface Manager
 {
-    public function bindGlobalFacade(string $name, string $key): Manager;
-    public function bindLocalFacade(string $name, string $key): Manager;
-    public function bindRootFacade(string $name, string $key): Manager;
-    public function bindNamespaceFacade(string $name, string $key, string $namespace): Manager;
-    public function hasFacade(string $name): bool;
-    public function hasFacadePlugin(string $facadeName, string $pluginName): bool;
-    public function prepareFacade(string $name): ?Binding;
-    public function getFacades(): array;
+    public function bind(string $name, string $key): Manager;
+    public function has(string $name): bool;
+    public function hasPlugin(string $bindName, string $pluginName): bool;
+    public function prepare(string $name): ?Binding;
+    public function getBindings(): array;
 
-    public function load(string $name, ?string $namespace): bool;
-    public function loadManual(string $name, string $className): bool;
+    public function load(string $name, string $className): bool;
 }

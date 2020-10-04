@@ -4,28 +4,28 @@
  * @license http://opensource.org/licenses/MIT
  */
 declare(strict_types=1);
-namespace DecodeLabs\Veneer;
+namespace DecodeLabs\Veneer\Plugin;
 
 use DecodeLabs\Veneer\Register;
-use Psr\Container\ContainerInterface;
+use DecodeLabs\Veneer\Plugin;
 
-trait FacadePluginAccessTargetTrait
+trait AccessTargetTrait
 {
     protected $plugins = [];
 
     /**
      * Load local object plugin
      */
-    public function __get(string $name): FacadePlugin
+    public function __get(string $name): Plugin
     {
         if (!isset($this->plugins[$name])) {
-            $this->plugins[$name] = $this->loadFacadePlugin($name);
+            $this->plugins[$name] = $this->loadVeneerPlugin($name);
         }
 
         return $this->plugins[$name];
     }
 
-    public function cacheLoadedFacadePlugin(string $name, FacadePlugin $plugin): void
+    public function cacheLoadedVeneerPlugin(string $name, Plugin $plugin): void
     {
         $this->plugins[$name] = $plugin;
     }
