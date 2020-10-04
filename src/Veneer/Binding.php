@@ -6,6 +6,12 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
+use DecodeLabs\Veneer;
+use DecodeLabs\Veneer\Proxy;
+use DecodeLabs\Veneer\ProxyTrait;
+use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
+use DecodeLabs\Veneer\Plugin\AccessTarget as PluginAccessTarget;
+
 use DecodeLabs\Glitch\Dumpable;
 use DecodeLabs\Exceptional;
 
@@ -15,9 +21,6 @@ class Binding
 {
     protected $name;
     protected $key;
-    protected $root = false;
-    protected $current = false;
-    protected $namespace = null;
 
     protected $target;
     protected $pluginNames = [];
@@ -25,13 +28,10 @@ class Binding
     /**
      * Init with criteria
      */
-    public function __construct(string $name, string $key, bool $root=false, bool $current=false, string $namespace=null)
+    public function __construct(string $name, string $key)
     {
         $this->name = $name;
         $this->key = $key;
-        $this->root = $root;
-        $this->current = $current;
-        $this->namespace = $namespace;
     }
 
     /**
@@ -56,14 +56,14 @@ class Binding
             );
         }
 
-        if ($instance instanceof FacadeTarget) {
-            $this->pluginNames = $instance->getFacadePluginNames();
+        if ($instance instanceof PluginProvider) {
+            $this->pluginNames = $instance->getVeneerPluginNames();
         } else {
             $this->pluginNames = [];
         }
 
         $this->target = $this->createBindingClass($instance, $this->pluginNames);
-        ($this->target)::$instance = $instance;
+        ($this->target)::setVeneerProxyTargetInstance($instance);
 
         $this->loadPlugins($this->pluginNames);
 
@@ -81,17 +81,17 @@ class Binding
     /**
      * Create binding class
      */
-    private function createBindingClass($instance, array $pluginNames): Facade
+    private function createBindingClass($instance, array $pluginNames): Proxy
     {
-        $class = 'return new class() implements '.Facade::class.' { use '.FacadeTrait::class.'; ';
+        $class = 'return new class() implements '.Proxy::class.' { use '.ProxyTrait::class.'; ';
         $plugins = $consts = [];
         $ref = new \ReflectionClass($instance);
         $instName = $ref->getName();
 
-        $consts['FACADE'] = 'const FACADE = \''.$this->name.'\';';
+        $consts['VENEER'] = 'const VENEER = \''.$this->name.'\';';
 
         foreach ($ref->getConstants() as $key => $val) {
-            if ($key === 'FACADE') {
+            if ($key === 'VENEER') {
                 continue;
             }
 
@@ -111,6 +111,23 @@ class Binding
         }
 
         $class .= '};';
+
+        if (Veneer::shouldCacheBindings()) {
+            $hash = md5($class);
+            $path = '/tmp/decodelabs/veneer';
+            $fileName = $path.'/binding_'.$hash.'.php';
+
+            if (!is_file($fileName)) {
+                if (!is_dir($path)) {
+                    mkdir($path, 0755, true);
+                }
+
+                file_put_contents($fileName, '<?php'."\n".$class);
+            }
+
+            return require $fileName;
+        }
+
         return eval($class);
     }
 
@@ -121,15 +138,15 @@ class Binding
     {
         foreach ($pluginNames as $name) {
             ($this->target)::$$name = new class(function () use ($name) {
-                $output = ($this->target)::$instance->loadFacadePlugin($name);
+                $output = ($this->target)::$instance->loadVeneerPlugin($name);
 
-                if (($this->target)::$instance instanceof FacadePluginAccessTarget) {
-                    ($this->target)::$instance->cacheLoadedFacadePlugin($name, $output);
+                if (($this->target)::$instance instanceof PluginAccessTarget) {
+                    ($this->target)::$instance->cacheLoadedVeneerPlugin($name, $output);
                 }
 
                 return $output;
             }) implements Dumpable {
-                const FACADE_PLUGIN = true;
+                const VENEER_PLUGIN = true;
 
                 protected $loader;
                 protected $plugin;
@@ -197,37 +214,13 @@ class Binding
     }
 
     /**
-     * Should generate in root?
-     */
-    public function isRoot(): bool
-    {
-        return $this->root;
-    }
-
-    /**
-     * Should generate in current namespace?
-     */
-    public function isCurrent(): bool
-    {
-        return $this->current;
-    }
-
-    /**
-     * Get target namespace
-     */
-    public function getNamespace(): ?string
-    {
-        return $this->namespace;
-    }
-
-    /**
      * Get bind target
      */
     public function getTarget(): object
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Facade '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy '.$this->name.' has not been bound to target yet', null, $this
             );
         }
 
@@ -241,7 +234,7 @@ class Binding
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Facade '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy '.$this->name.' has not been bound to target yet', null, $this
             );
         }
 
@@ -255,7 +248,7 @@ class Binding
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Facade '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy '.$this->name.' has not been bound to target yet', null, $this
             );
         }
 

@@ -6,6 +6,6 @@
 declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
-interface FacadePlugin
+interface Plugin
 {
 }

@@ -8,9 +8,25 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 
-trait FacadeTrait
+trait ProxyTrait
 {
     public static $instance;
+
+    /**
+     * Set Veneer Proxy target instance
+     */
+    public static function setVeneerProxyTargetInstance(object $instance): void
+    {
+        self::$instance = $instance;
+    }
+
+    /**
+     * Get Veneer Proxy target instance
+     */
+    public static function getVeneerProxyTargetInstance(): ?object
+    {
+        return self::$instance;
+    }
 
     /**
      * Passthrough all static calls to instance
@@ -19,7 +35,7 @@ trait FacadeTrait
     {
         if (!self::$instance) {
             throw Exceptional::Runtime(
-                'No target object has been bound in '.$name.' facade'
+                'No target object has been bound in '.$name.' proxy'
             );
         }
 

@@ -1,3 +1,12 @@
+## v0.6.0 (2020-10-04)
+* Restructured main library classes
+* Simplified proxy registration
+* Removed Veneer facade
+* Removed support for auto namespace loading
+* Removed listener structure
+* Normalised plugin interface
+* Added binding cache support for PHPStan
+
 ## v0.5.5 (2020-10-02)
 * Updated glitch-support
 

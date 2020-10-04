@@ -11,27 +11,24 @@
     "require": {
         "php": "^7.2",
 
-        "decodelabs/exceptional": "^0.2",
-        "decodelabs/glitch-support": "^0.2",
+        "decodelabs/exceptional": "^0.2.8",
+        "decodelabs/glitch-support": "^0.2.1",
 
         "psr/container": "^1"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",
         "phpstan/phpstan": "^0.12.45",
-        "decodelabs/phpstan-decodelabs": "^0.3.5"
+        "decodelabs/phpstan-decodelabs": "^0.3.8"
     },
     "autoload": {
         "psr-4": {
-            "DecodeLabs\\Veneer\\": "src/Veneer"
-        },
-        "files": [
-            "src/global.php"
-        ]
+            "DecodeLabs\\": "src/"
+        }
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.5.x-dev"
+            "dev-develop": "0.6.x-dev"
         }
     }
 }
