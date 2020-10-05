@@ -81,25 +81,34 @@ class Binding
     /**
      * Create binding class
      */
-    private function createBindingClass($instance, array $pluginNames): Proxy
+    private function createBindingClass(object $instance, array $pluginNames): Proxy
     {
-        $class = 'return new class() implements '.Proxy::class.' { use '.ProxyTrait::class.'; ';
         $plugins = $consts = [];
         $ref = new \ReflectionClass($instance);
         $instName = $ref->getName();
+        $className = $this->name;
+
+        $class =
+            'namespace DecodeLabs\\Veneer\\Binding;'."\n".
+            'use DecodeLabs\\Veneer\\Proxy;'."\n".
+            'use DecodeLabs\\Veneer\\ProxyTrait;'."\n".
+            'use '.$instName.' as Inst;'."\n".
+            'class '.$className.' implements Proxy { use ProxyTrait; '."\n";
+
 
         $consts['VENEER'] = 'const VENEER = \''.$this->name.'\';';
+        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = \'\\'.$instName.'\';';
 
         foreach ($ref->getConstants() as $key => $val) {
             if ($key === 'VENEER') {
                 continue;
             }
 
-            $consts[$key] = 'const '.$key.' = '.$instName.'::'.$key.';';
+            $consts[$key] = 'const '.$key.' = \\'.$instName.'::'.$key.';'."\n";
         }
 
         if (!empty($consts)) {
-            $class .= implode(' ', $consts).' ';
+            $class .= implode("\n", $consts);
         }
 
         foreach ($pluginNames as $name) {
@@ -107,10 +116,11 @@ class Binding
         }
 
         if (!empty($plugins)) {
-            $class .= implode(' ', $plugins).' ';
+            $class .= implode("\n", $plugins);
         }
 
-        $class .= '};';
+        $class .= '};'."\n";
+        $class .= 'return new '.$className.'();'."\n";
 
         if (Veneer::shouldCacheBindings()) {
             $hash = md5($class);
