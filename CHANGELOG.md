@@ -1,3 +1,5 @@
+* Added PSR11 container accessors
+
 ## v0.6.3 (2020-10-05)
 * Improved readme
 * Updated PHPStan
