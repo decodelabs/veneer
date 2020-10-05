@@ -1,3 +1,6 @@
+## v0.6.2 (2020-10-04)
+* Updated binding handling for PHPStan
+
 ## v0.6.1 (2020-10-04)
 * Fixed cached binding support for PHPStan
 
