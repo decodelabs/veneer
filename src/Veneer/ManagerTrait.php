@@ -18,18 +18,34 @@ trait ManagerTrait
      */
     public function __construct(?ContainerInterface $container=null)
     {
+        $this->setContainer($container);
+    }
+
+
+    /**
+     * Set PSR11 container
+     */
+    public function setContainer(?ContainerInterface $container): void
+    {
         $this->container = $container;
+    }
+
+    /**
+     * Get PSR11 container
+     */
+    public function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
     }
 
 
     /**
      * Add alias that can be used from root namespace
      */
-    public function bind(string $name, string $key): Manager
+    public function bind(string $name, string $key): void
     {
         $binding = new Binding($name, $key);
         $this->bindings[$binding->getName()] = $binding;
-        return $this;
     }
 
     /**
