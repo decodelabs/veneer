@@ -3,11 +3,11 @@
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/veneer?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 [![Latest Version](https://img.shields.io/packagist/v/decodelabs/veneer.svg?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 [![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/veneer.svg?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
-[![Build Status](https://img.shields.io/travis/decodelabs/veneer/develop.svg?style=flat-square)](https://travis-ci.org/decodelabs/veneer)
+[![Build Status](https://img.shields.io/travis/com/decodelabs/veneer/master.svg?style=flat-square)](https://travis-ci.org/decodelabs/veneer)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat-square)](https://github.com/phpstan/phpstan)
 [![License](https://img.shields.io/packagist/l/decodelabs/veneer?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 
-Create automated static Facades for your PHP objects via any PSR-11 container.
+Create automated static frontages for your PHP objects.
 
 ## Install
 
@@ -30,109 +30,30 @@ namespace Some\Random\Library
 }
 ```
 
-You can bind a global name to an instance of the class to be used statically.
-Either via a PSR 11 container:
+
+You can bind a static, automatically generated frontage by:
 
 ```php
 namespace App\Setup
 {
     // This is your environment setup code
-    use DecodeLabs\Veneer\Manager;
-    use DecodeLabs\Veneer\Listener\AutoLoad as Listener;
+    use DecodeLabs\Veneer;
     use Some\Random\Library\MyThing;
+    use App\CoolThing;
 
-    // Use whatever PSR 11 container you want
-    $psr11Container = new WhateverContainer();
-
-    // Create and bind your main listener
-    $listener = new Listener();
-    $psr11Container->bind(Listener::class, $listener);
-
-    // Bind your instance to your container
-    $psr11Container->bind('thing', new MyThing());
-
-    // Create a veneer manager
-    $manager = new Manager($psr11Container);
-    $psr11Container->bind(Manager::class, $manager);
-    $listener->registerManager($manager);
-
-    // Bind the name "CoolThing" to your instance in the container
-    $manager->bindGlobalFacade('CoolThing', 'thing');
-}
-
-
-namespace Some\Other\Code
-{
-    // Your general userland code
-    // No need to import any namespaces for global facades -
-    // they are loaded into the current namespace automatically
-    CoolThing::doAThing();
-
-    // Logically equivalent to: (without the fuss)
-    $psr11Container->get('thing')->doAThing();
-}
-```
-
-...or directly, without a container, using the class name as the instance key:
-
-```php
-namespace App\Setup
-{
-    // This is your environment setup code
-    use DecodeLabs\Veneer\Register;
-    use DecodeLabs\Veneer\Manager;
-    use DecodeLabs\Veneer\Listener\AutoLoad as Listener;
-    use Some\Random\Library\MyThing;
-
-    // Create a veneer manager
-    $manager = new Manager();
-    Register::getGlobalListener()->registerManager($manager);
-
-    // Bind the name "CoolThing" to your instance in the container
-    $manager->bindGlobalFacade('CoolThing', MyThing::class);
+    Veneer::register(
+        MyThing::class, // active object class
+        MyThingFrontage::class // frontage class
+    );
 }
 
 namespace Some\Other\Code
 {
+    use App\CoolThing;
+
     // Your general userland code
     CoolThing::doAThing();
 }
-```
-
-
-## Extended functionality
-
-Implement <code>DecodeLabs\Veneer\FacadeTarget</code> to access advanced Facade features.
-
-```php
-namespace My\Library
-{
-    use DecodeLabs\Veneer\Manager;
-    use DecodeLabs\Veneer\FacadeTarget;
-    use DecodeLabs\Veneer\FacadeTargetTrait;
-
-    class MyThing implements FacadeTarget {
-        use FacadeTargetTrait;
-
-        /**
-         * Optionally define custom binding method
-         * Default is global as below
-         */
-        public static function bindFacade(Manager $manager, string $name, string $class): void
-        {
-            $manager->bindGlobalFacade($name, $class);
-        }
-    }
-}
-```
-
-### Binding shortcuts
-
-Shortcut the facade binding process with a static call directly to the target class:
-
-```php
-// Register as global facade
-\My\Library\MyThing::registerFacade();
 ```
 
 
@@ -146,15 +67,15 @@ Define two methods on your <code>FacadeTarget</code>
 ```php
 namespace My\Library
 {
-    use DecodeLabs\Veneer\FacadeTarget;
-    use DecodeLabs\Veneer\FacadeTargetTrait;
-    use DecodeLabs\Veneer\FacadeTargetPlugin;
+    use DecodeLabs\Veneer\Plugin;
+    use DecodeLabs\Veneer\Plugin\Provider;
+    use DecodeLabs\Veneer\Plugin\ProviderTrait;
 
-    class MyThing implements FacadeTarget {
+    class MyThing implements Provider {
 
-        use FacadeTargetTrait;
+        use ProviderTrait;
 
-        public function getFacadePluginNames(): array {
+        public function getVeneerPluginNames(): array {
             // Return the list of plugin names to be accessed from the facade
             return [
                 'plugin1',
@@ -162,11 +83,11 @@ namespace My\Library
             ];
         }
 
-        public function loadFacadePlugin(string $name): FacadePlugin {
-            // Load plugin object (must implement FacadePlugin)
+        public function loadVeneerPlugin(string $name): Plugin {
+            // Load plugin object (must implement Plugin)
 
             // This is just a quick example using anonymous classes:
-            return new class($name) implements FacadeTarget {
+            return new class($name) implements Plugin {
 
                 public $name;
 
@@ -184,6 +105,8 @@ namespace My\Library
 
 namespace Some\Other\Code
 {
+    use My\Library\MyThing;
+
     MyThing::$plugin1->doAThing(); // Hello from plugin1
 }
 ```
