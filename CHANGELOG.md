@@ -1,3 +1,7 @@
+## v0.6.3 (2020-10-05)
+* Improved readme
+* Updated PHPStan
+
 ## v0.6.2 (2020-10-04)
 * Updated binding handling for PHPStan
 
