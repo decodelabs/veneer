@@ -1,9 +1,12 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs;
 
 use DecodeLabs\Veneer\Manager;
@@ -13,7 +16,7 @@ use Psr\Container\ContainerInterface;
 
 final class Veneer
 {
-    protected static $defaultManager;
+    private static $defaultManager;
 
     /**
      * Set default manager
