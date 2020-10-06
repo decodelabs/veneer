@@ -1,9 +1,12 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
@@ -35,10 +38,10 @@ trait ProxyTrait
     {
         if (!self::$instance) {
             throw Exceptional::Runtime(
-                'No target object has been bound in '.$name.' proxy'
+                'No target object has been bound in ' . $name . ' proxy'
             );
         }
 
-        return (self::$instance)->{$name}(...$args);
+        return self::$instance->{$name}(...$args);
     }
 }

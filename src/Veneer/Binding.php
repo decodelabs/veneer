@@ -1,19 +1,20 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs\Veneer;
 
-use DecodeLabs\Veneer;
-use DecodeLabs\Veneer\Proxy;
-use DecodeLabs\Veneer\ProxyTrait;
-use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
-use DecodeLabs\Veneer\Plugin\AccessTarget as PluginAccessTarget;
-
-use DecodeLabs\Glitch\Dumpable;
 use DecodeLabs\Exceptional;
+use DecodeLabs\Glitch\Dumpable;
+
+use DecodeLabs\Veneer;
+use DecodeLabs\Veneer\Plugin\AccessTarget as PluginAccessTarget;
+use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
 
 use Psr\Container\ContainerInterface;
 
@@ -52,7 +53,9 @@ class Binding
 
         if (!$instance) {
             throw Exceptional::Runtime(
-                'Could not get instance of '.$this->key.' to bind to', null, $this
+                'Could not get instance of ' . $this->key . ' to bind to',
+                null,
+                $this
             );
         }
 
@@ -63,7 +66,7 @@ class Binding
         }
 
         $this->target = $this->createBindingClass($instance, $this->pluginNames);
-        ($this->target)::setVeneerProxyTargetInstance($instance);
+        $this->target::setVeneerProxyTargetInstance($instance);
 
         $this->loadPlugins($this->pluginNames);
 
@@ -89,22 +92,22 @@ class Binding
         $className = $this->name;
 
         $class =
-            'namespace DecodeLabs\\Veneer\\Binding;'."\n".
-            'use DecodeLabs\\Veneer\\Proxy;'."\n".
-            'use DecodeLabs\\Veneer\\ProxyTrait;'."\n".
-            'use '.$instName.' as Inst;'."\n".
-            'class '.$className.' implements Proxy { use ProxyTrait; '."\n";
+            'namespace DecodeLabs\\Veneer\\Binding;' . "\n" .
+            'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
+            'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
+            'use ' . $instName . ' as Inst;' . "\n" .
+            'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
 
 
-        $consts['VENEER'] = 'const VENEER = \''.$this->name.'\';';
-        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = \'\\'.$instName.'\';';
+        $consts['VENEER'] = 'const VENEER = \'' . $this->name . '\';';
+        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = \'\\' . $instName . '\';';
 
-        foreach ($ref->getConstants() as $key => $val) {
+        foreach (array_keys($ref->getConstants()) as $key) {
             if ($key === 'VENEER') {
                 continue;
             }
 
-            $consts[$key] = 'const '.$key.' = \\'.$instName.'::'.$key.';'."\n";
+            $consts[$key] = 'const ' . $key . ' = \\' . $instName . '::' . $key . ';' . "\n";
         }
 
         if (!empty($consts)) {
@@ -112,27 +115,27 @@ class Binding
         }
 
         foreach ($pluginNames as $name) {
-            $plugins[$name] = 'public static $'.$name.';';
+            $plugins[$name] = 'public static $' . $name . ';';
         }
 
         if (!empty($plugins)) {
             $class .= implode("\n", $plugins);
         }
 
-        $class .= '};'."\n";
-        $class .= 'return new '.$className.'();'."\n";
+        $class .= '};' . "\n";
+        $class .= 'return new ' . $className . '();' . "\n";
 
         if (Veneer::shouldCacheBindings()) {
             $hash = md5($class);
             $path = '/tmp/decodelabs/veneer';
-            $fileName = $path.'/binding_'.$hash.'.php';
+            $fileName = $path . '/binding_' . $hash . '.php';
 
             if (!is_file($fileName)) {
                 if (!is_dir($path)) {
                     mkdir($path, 0755, true);
                 }
 
-                file_put_contents($fileName, '<?php'."\n".$class);
+                file_put_contents($fileName, '<?php' . "\n" . $class);
             }
 
             return require $fileName;
@@ -147,16 +150,16 @@ class Binding
     private function loadPlugins(array $pluginNames): void
     {
         foreach ($pluginNames as $name) {
-            ($this->target)::$$name = new class(function () use ($name) {
-                $output = ($this->target)::$instance->loadVeneerPlugin($name);
+            $this->target::$$name = new class(function () use ($name) {
+                $output = $this->target::$instance->loadVeneerPlugin($name);
 
-                if (($this->target)::$instance instanceof PluginAccessTarget) {
-                    ($this->target)::$instance->cacheLoadedVeneerPlugin($name, $output);
+                if ($this->target::$instance instanceof PluginAccessTarget) {
+                    $this->target::$instance->cacheLoadedVeneerPlugin($name, $output);
                 }
 
                 return $output;
             }) implements Dumpable {
-                const VENEER_PLUGIN = true;
+                public const VENEER_PLUGIN = true;
 
                 protected $loader;
                 protected $plugin;
@@ -230,7 +233,9 @@ class Binding
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Proxy '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy ' . $this->name . ' has not been bound to target yet',
+                null,
+                $this
             );
         }
 
@@ -244,7 +249,9 @@ class Binding
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Proxy '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy ' . $this->name . ' has not been bound to target yet',
+                null,
+                $this
             );
         }
 
@@ -258,7 +265,9 @@ class Binding
     {
         if (!$this->target) {
             throw Exceptional::Runtime(
-                'Proxy '.$this->name.' has not been bound to target yet', null, $this
+                'Proxy ' . $this->name . ' has not been bound to target yet',
+                null,
+                $this
             );
         }
 

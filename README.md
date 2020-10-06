@@ -3,7 +3,7 @@
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/veneer?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 [![Latest Version](https://img.shields.io/packagist/v/decodelabs/veneer.svg?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 [![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/veneer.svg?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
-[![Build Status](https://img.shields.io/travis/com/decodelabs/veneer/master.svg?style=flat-square)](https://travis-ci.org/decodelabs/veneer)
+[![Build Status](https://img.shields.io/travis/com/decodelabs/veneer/master.svg?style=flat-square)](https://travis-ci.com/decodelabs/veneer)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat-square)](https://github.com/phpstan/phpstan)
 [![License](https://img.shields.io/packagist/l/decodelabs/veneer?style=flat-square)](https://packagist.org/packages/decodelabs/veneer)
 

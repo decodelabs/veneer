@@ -1,15 +1,16 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs\Veneer\Manager;
 
 use DecodeLabs\Veneer\Manager;
 use DecodeLabs\Veneer\ManagerTrait;
-
-use Psr\Container\ContainerInterface;
 
 class Aliasing implements Manager
 {

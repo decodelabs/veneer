@@ -1,17 +1,22 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs;
 
 use DecodeLabs\Veneer\Manager;
 use DecodeLabs\Veneer\Manager\Aliasing as AliasingManager;
 
+use Psr\Container\ContainerInterface;
+
 final class Veneer
 {
-    protected static $defaultManager;
+    private static $defaultManager;
 
     /**
      * Set default manager
@@ -55,6 +60,23 @@ final class Veneer
         foreach ($proxyClasses as $className) {
             $manager->load($name, $className);
         }
+    }
+
+
+    /**
+     * Set PSR11 container
+     */
+    public static function setContainer(?ContainerInterface $container): void
+    {
+        self::getDefaultManager()->setContainer($container);
+    }
+
+    /**
+     * Get PSR11 container
+     */
+    public static function getContainer(): ?ContainerInterface
+    {
+        return self::getDefaultManager()->getContainer();
     }
 
 

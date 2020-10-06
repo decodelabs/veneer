@@ -1,15 +1,16 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs\Veneer\Plugin;
 
-use DecodeLabs\Veneer;
-use DecodeLabs\Veneer\Plugin;
-
 use DecodeLabs\Exceptional;
+use DecodeLabs\Veneer\Plugin;
 
 trait ProviderTrait
 {
@@ -27,7 +28,9 @@ trait ProviderTrait
     public function loadVeneerPlugin(string $name): Plugin
     {
         throw Exceptional::Implementation(
-            'Veneer provider has not implemented a plugin loader', null, $this
+            'Veneer provider has not implemented a plugin loader',
+            null,
+            $this
         );
     }
 }

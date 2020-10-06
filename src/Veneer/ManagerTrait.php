@@ -1,9 +1,12 @@
 <?php
+
 /**
- * This file is part of the Veneer package
+ * @package Veneer
  * @license http://opensource.org/licenses/MIT
  */
+
 declare(strict_types=1);
+
 namespace DecodeLabs\Veneer;
 
 use Psr\Container\ContainerInterface;
@@ -16,20 +19,36 @@ trait ManagerTrait
     /**
      * Init with container and loader
      */
-    public function __construct(?ContainerInterface $container=null)
+    public function __construct(?ContainerInterface $container = null)
+    {
+        $this->setContainer($container);
+    }
+
+
+    /**
+     * Set PSR11 container
+     */
+    public function setContainer(?ContainerInterface $container): void
     {
         $this->container = $container;
+    }
+
+    /**
+     * Get PSR11 container
+     */
+    public function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
     }
 
 
     /**
      * Add alias that can be used from root namespace
      */
-    public function bind(string $name, string $key): Manager
+    public function bind(string $name, string $key): void
     {
         $binding = new Binding($name, $key);
         $this->bindings[$binding->getName()] = $binding;
-        return $this;
     }
 
     /**
