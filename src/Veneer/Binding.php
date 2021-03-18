@@ -18,6 +18,8 @@ use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
 
 use Psr\Container\ContainerInterface;
 
+use ReflectionClass;
+
 class Binding
 {
     protected $name;
@@ -87,7 +89,7 @@ class Binding
     private function createBindingClass(object $instance, array $pluginNames): Proxy
     {
         $plugins = $consts = [];
-        $ref = new \ReflectionClass($instance);
+        $ref = new ReflectionClass($instance);
         $instName = $ref->getName();
         $className = $this->name;
 
