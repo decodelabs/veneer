@@ -1,3 +1,6 @@
+## v0.7.0 (2021-03-18)
+* Enabled PHP8 testing
+
 ## v0.6.4 (2020-10-06)
 * Added PSR11 container accessors
 * Applied full PSR12 standards
