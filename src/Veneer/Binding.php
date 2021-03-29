@@ -152,7 +152,7 @@ class Binding
     private function loadPlugins(array $pluginNames): void
     {
         foreach ($pluginNames as $name) {
-            $this->target::$$name = new class(function () use ($name) {
+            $loader = function () use ($name) {
                 $output = $this->target::$instance->loadVeneerPlugin($name);
 
                 if ($this->target::$instance instanceof PluginAccessTarget) {
@@ -160,7 +160,9 @@ class Binding
                 }
 
                 return $output;
-            }) implements Dumpable {
+            };
+
+            $this->target::$$name = new class($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
                 protected $loader;
