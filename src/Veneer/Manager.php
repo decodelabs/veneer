@@ -20,6 +20,10 @@ interface Manager
     public function has(string $name): bool;
     public function hasPlugin(string $bindName, string $pluginName): bool;
     public function prepare(string $name): ?Binding;
+
+    /**
+     * @return array<string, Binding>
+     */
     public function getBindings(): array;
 
     public function load(string $name, string $className): bool;

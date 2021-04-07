@@ -16,6 +16,9 @@ use Psr\Container\ContainerInterface;
 
 final class Veneer
 {
+    /**
+     * @var Manager|null
+     */
     private static $defaultManager;
 
     /**
@@ -31,7 +34,7 @@ final class Veneer
      */
     public static function getDefaultManager(): Manager
     {
-        if (!self::$defaultManager) {
+        if (self::$defaultManager === null) {
             self::$defaultManager = new AliasingManager();
         }
 
