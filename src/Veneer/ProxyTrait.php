@@ -13,6 +13,9 @@ use DecodeLabs\Exceptional;
 
 trait ProxyTrait
 {
+    /**
+     * @var mixed
+     */
     public static $instance;
 
     /**

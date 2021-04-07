@@ -13,7 +13,14 @@ use Psr\Container\ContainerInterface;
 
 trait ManagerTrait
 {
+    /**
+     * @var array<string, Binding>
+     */
     protected $bindings = [];
+
+    /**
+     * @var ContainerInterface|null
+     */
     protected $container;
 
     /**

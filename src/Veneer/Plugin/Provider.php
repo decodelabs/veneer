@@ -13,6 +13,10 @@ use DecodeLabs\Veneer\Plugin;
 
 interface Provider
 {
+    /**
+     * @return array<string>
+     */
     public function getVeneerPluginNames(): array;
+
     public function loadVeneerPlugin(string $name): Plugin;
 }

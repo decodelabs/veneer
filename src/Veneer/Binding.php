@@ -18,13 +18,31 @@ use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
 
 use Psr\Container\ContainerInterface;
 
+use ReflectionClass;
+
 class Binding
 {
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var string
+     */
     protected $key;
 
+
+    /**
+     * @var Proxy|null
+     */
     protected $target;
+
+    /**
+     * @var array<string>
+     */
     protected $pluginNames = [];
+
 
     /**
      * Init with criteria
@@ -83,11 +101,13 @@ class Binding
 
     /**
      * Create binding class
+     *
+     * @param array<string> $pluginNames
      */
     private function createBindingClass(object $instance, array $pluginNames): Proxy
     {
         $plugins = $consts = [];
-        $ref = new \ReflectionClass($instance);
+        $ref = new ReflectionClass($instance);
         $instName = $ref->getName();
         $className = $this->name;
 
@@ -146,48 +166,83 @@ class Binding
 
     /**
      * Load plugins from target
+     *
+     * @param array<string> $pluginNames
      */
     private function loadPlugins(array $pluginNames): void
     {
         foreach ($pluginNames as $name) {
-            $this->target::$$name = new class(function () use ($name) {
-                $output = $this->target::$instance->loadVeneerPlugin($name);
+            $loader = function () use ($name) {
+                if ($this->target === null) {
+                    throw Exceptional::Setup('Target binding has not been created');
+                }
 
-                if ($this->target::$instance instanceof PluginAccessTarget) {
-                    $this->target::$instance->cacheLoadedVeneerPlugin($name, $output);
+                $instance = $this->target::getVeneerProxyTargetInstance();
+
+                if (!$instance instanceof PluginProvider) {
+                    return null;
+                }
+
+                $output = $instance->loadVeneerPlugin($name);
+
+                if ($instance instanceof PluginAccessTarget) {
+                    $instance->cacheLoadedVeneerPlugin($name, $output);
                 }
 
                 return $output;
-            }) implements Dumpable {
+            };
+
+            $this->target::$$name = new class($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
+                /**
+                 * @var callable
+                 */
                 protected $loader;
+
+                /**
+                 * @var Plugin|null
+                 */
                 protected $plugin;
 
+
+                /**
+                 * Init with loader
+                 */
                 public function __construct(callable $loader)
                 {
                     $this->loader = $loader;
                 }
 
+
+                /**
+                 * @return mixed
+                 */
                 public function __get(string $name)
                 {
-                    if (!$this->plugin) {
+                    if ($this->plugin === null) {
                         $this->loadPlugin();
                     }
 
                     return $this->plugin->{$name};
                 }
 
+
+                /**
+                 * @param array<mixed> $args
+                 * @return mixed
+                 */
                 public function __call(string $name, array $args)
                 {
-                    if (!$this->plugin) {
+                    if ($this->plugin === null) {
                         $this->loadPlugin();
                     }
 
                     return $this->plugin->{$name}(...$args);
                 }
 
-                private function loadPlugin()
+
+                private function loadPlugin(): void
                 {
                     $loader = $this->loader;
                     $this->plugin = $loader();
@@ -196,10 +251,12 @@ class Binding
 
                 /**
                  * Export for dump inspection
+                 *
+                 * @return iterable<string, mixed>
                  */
                 public function glitchDump(): iterable
                 {
-                    if (!$this->plugin) {
+                    if ($this->plugin === null) {
                         $this->loadPlugin();
                     }
 
@@ -231,7 +288,7 @@ class Binding
      */
     public function getTarget(): object
     {
-        if (!$this->target) {
+        if ($this->target === null) {
             throw Exceptional::Runtime(
                 'Proxy ' . $this->name . ' has not been bound to target yet',
                 null,
@@ -244,10 +301,12 @@ class Binding
 
     /**
      * Get plugin names
+     *
+     * @return array<string>
      */
     public function getPluginNames(): array
     {
-        if (!$this->target) {
+        if ($this->target === null) {
             throw Exceptional::Runtime(
                 'Proxy ' . $this->name . ' has not been bound to target yet',
                 null,
@@ -263,7 +322,7 @@ class Binding
      */
     public function hasPlugin(string $name): bool
     {
-        if (!$this->target) {
+        if ($this->target === null) {
             throw Exceptional::Runtime(
                 'Proxy ' . $this->name . ' has not been bound to target yet',
                 null,
