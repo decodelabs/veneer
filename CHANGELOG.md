@@ -1,3 +1,6 @@
+## v0.7.2 (2021-04-16)
+* Disabled strict typing in Binding class
+
 ## v0.7.1 (2021-04-07)
 * Updated for max PHPStan conformance
 
