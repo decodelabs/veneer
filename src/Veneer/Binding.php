@@ -55,6 +55,8 @@ class Binding
 
     /**
      * Extract target object
+     *
+     * @return $this
      */
     public function bindInstance(?ContainerInterface $container): Binding
     {
