@@ -27,6 +27,9 @@
             "DecodeLabs\\": "src/"
         }
     },
+    "bin": [
+        "bin/veneer-stub"
+    ],
     "extra": {
         "branch-alias": {
             "dev-develop": "0.7.x-dev"

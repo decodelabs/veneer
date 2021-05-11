@@ -43,6 +43,11 @@ class Binding
      */
     protected $pluginNames = [];
 
+    /**
+     * @var array<string>
+     */
+    protected $aliases = [];
+
 
     /**
      * Init with criteria
@@ -85,7 +90,7 @@ class Binding
             $this->pluginNames = [];
         }
 
-        $this->target = $this->createBindingClass($instance, $this->pluginNames);
+        $this->target = $this->createBindingClass($instance);
         $this->target::setVeneerProxyTargetInstance($instance);
 
         $this->loadPlugins($this->pluginNames);
@@ -103,49 +108,15 @@ class Binding
 
     /**
      * Create binding class
-     *
-     * @param array<string> $pluginNames
      */
-    private function createBindingClass(object $instance, array $pluginNames): Proxy
+    private function createBindingClass(object $instance): Proxy
     {
-        $plugins = $consts = [];
-        $ref = new ReflectionClass($instance);
-        $instName = $ref->getName();
-        $className = $this->name;
+        $class = $this->generateBindingClass(
+            'DecodeLabs\\Veneer\\Binding',
+            get_class($instance)
+        );
 
-        $class =
-            'namespace DecodeLabs\\Veneer\\Binding;' . "\n" .
-            'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
-            'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
-            'use ' . $instName . ' as Inst;' . "\n" .
-            'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
-
-
-        $consts['VENEER'] = 'const VENEER = \'' . $this->name . '\';';
-        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = \'\\' . $instName . '\';';
-
-        foreach (array_keys($ref->getConstants()) as $key) {
-            if ($key === 'VENEER') {
-                continue;
-            }
-
-            $consts[$key] = 'const ' . $key . ' = \\' . $instName . '::' . $key . ';' . "\n";
-        }
-
-        if (!empty($consts)) {
-            $class .= implode("\n", $consts);
-        }
-
-        foreach ($pluginNames as $name) {
-            $plugins[$name] = 'public static $' . $name . ';';
-        }
-
-        if (!empty($plugins)) {
-            $class .= implode("\n", $plugins);
-        }
-
-        $class .= '};' . "\n";
-        $class .= 'return new ' . $className . '();' . "\n";
+        $class .= 'return new ' . $this->name . '();' . "\n";
 
         if (Veneer::shouldCacheBindings()) {
             $hash = md5($class);
@@ -165,6 +136,65 @@ class Binding
 
         return eval($class);
     }
+
+
+    /**
+     * Generate binding class definition
+     *
+     * @param class-string $instanceClass
+     */
+    public function generateBindingClass(?string $namespace, string $instanceClass): string
+    {
+        $plugins = $consts = [];
+        $ref = new ReflectionClass($instanceClass);
+        $instName = $ref->getName();
+        $className = $this->name;
+
+        $class =
+            'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
+            'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
+            'use ' . $instName . ' as Inst;' . "\n" .
+            'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
+
+
+        $consts['VENEER'] = 'const VENEER = \'' . $this->name . '\';';
+        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
+
+        foreach (array_keys($ref->getConstants()) as $key) {
+            if ($key === 'VENEER') {
+                continue;
+            }
+
+            $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
+        }
+
+        if (!empty($consts)) {
+            $class .= implode("\n", $consts);
+        }
+
+        foreach ($this->pluginNames as $name) {
+            $plugins[$name] = 'public static $' . $name . ';';
+        }
+
+        if (!empty($plugins)) {
+            $class .= implode("\n", $plugins);
+        }
+
+        $class .= '};' . "\n";
+
+
+        if ($namespace === null) {
+            $class = 'namespace {' . "\n" . $class . "\n" . '}';
+        } else {
+            $class = 'namespace ' . $namespace . ';' . "\n" . $class;
+        }
+
+        return $class;
+    }
+
+
+
+
 
     /**
      * Load plugins from target
@@ -288,7 +318,7 @@ class Binding
     /**
      * Get bind target
      */
-    public function getTarget(): object
+    public function getTarget(): Proxy
     {
         if ($this->target === null) {
             throw Exceptional::Runtime(
@@ -333,5 +363,25 @@ class Binding
         }
 
         return in_array($name, $this->pluginNames);
+    }
+
+
+
+    /**
+     * Register alias after loading
+     */
+    public function registerAlias(string $alias): void
+    {
+        $this->aliases[] = $alias;
+    }
+
+    /**
+     * Get list of registered aliases
+     *
+     * @return array<string>
+     */
+    public function getAliases(): array
+    {
+        return $this->aliases;
     }
 }

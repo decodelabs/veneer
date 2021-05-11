@@ -1,0 +1,80 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @package Veneer
+ * @license http://opensource.org/licenses/MIT
+ */
+
+declare(strict_types=1);
+
+namespace DecodeLabs\Veneer;
+
+$basePath = getcwd();
+
+foreach ([
+    $basePath . '/vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php'
+] as $file) {
+    if (file_exists($file)) {
+        require $file;
+        break;
+    }
+}
+
+use DecodeLabs\Atlas;
+use DecodeLabs\Exceptional;
+use DecodeLabs\Terminus as Cli;
+use DecodeLabs\Veneer;
+use DecodeLabs\Veneer\Stub\Generator;
+
+// Check dependencies
+if (!class_exists(Atlas::class)) {
+    throw Exceptional::Setup('Atlas is required for interactive stub generation');
+}
+if (!class_exists(Cli::class)) {
+    throw Exceptional::Setup('Terminus is required for interactive stub generation');
+}
+
+// Load source generator
+if (is_file($genPath = __DIR__ . '/../src/Veneer/Stub/Generator.php')) {
+    require_once $genPath;
+}
+
+// Get bindings
+$manager = Veneer::getDefaultManager();
+$bindings = $manager->getBindings();
+
+// Prepare arguments
+Cli::getCommandDefinition()
+    ->addArgument('?binding', 'Name of the binding');
+Cli::prepareArguments();
+
+// Ask for binding name
+if (null === ($bindingName = Cli::getArgument('binding'))) {
+    $bindingName = Cli::newQuestion('Which binding do you want to stub?')
+        ->setOptions(...array_keys($bindings))
+        ->prompt();
+}
+
+$bindingName = ucfirst($bindingName);
+
+// Load binding
+if (!isset($bindings[$bindingName])) {
+    Cli::operative('Binding not found');
+    exit;
+}
+
+$binding = $bindings[$bindingName];
+
+// Ask for stub path
+$stubPath = 'stubs/';
+$stubPath = Cli::ask('Where would you like to save it?', $stubPath);
+
+// Generate
+$dir = Atlas::createDir($stubPath);
+$generator = new Generator($dir);
+$generator->generate($binding);
+
+Cli::success('done');
+exit;
