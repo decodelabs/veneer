@@ -1,3 +1,6 @@
+## v0.7.5 (2021-05-11)
+* Added stub generator system
+
 ## v0.7.3 (2021-05-05)
 * Disabled strict types for ProxyTrait __callStatic
 

@@ -31,6 +31,8 @@ class Aliasing implements Manager
 
         $bindingClass = get_class($binding->getTarget());
         class_alias($bindingClass, $className);
+
+        $binding->registerAlias($className);
         return true;
     }
 }
