@@ -1,3 +1,6 @@
+## v0.8.0 (2021-10-20)
+* Simplified binding structure
+
 ## v0.7.5 (2021-05-11)
 * Added stub generator system
 
