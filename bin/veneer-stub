@@ -52,8 +52,13 @@ Cli::prepareArguments();
 
 // Ask for binding name
 if (null === ($bindingName = Cli::getArgument('binding'))) {
+    Cli::newLine();
+    foreach ($bindings as $proxyClass => $binding) {
+        Cli::{'>.yellow'}($proxyClass);
+    }
+    Cli::newLine();
+
     $bindingName = Cli::newQuestion('Which binding do you want to stub?')
-        ->setOptions(...array_keys($bindings))
         ->prompt();
 }
 
