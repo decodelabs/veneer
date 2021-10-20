@@ -41,29 +41,28 @@ class Generator
  */
 
 PHP;
-        foreach ($binding->getAliases() as $alias) {
-            $parts = explode('\\', $alias);
-            array_pop($parts);
+        $proxyClass = $binding->getProxyClass();
+        $parts = explode('\\', $proxyClass);
+        $fileName = implode('/', $parts);
+        array_pop($parts);
 
-            if (empty($parts)) {
-                $namespace = null;
-            } else {
-                $namespace = implode('\\', $parts);
-            }
-
-            $instance = $binding->getTarget()->getVeneerProxyTargetInstance();
-
-            if (!is_object($instance)) {
-                throw Exceptional::Setup($alias . ' instance has not been bound');
-            }
-
-            $code .= $binding->generateBindingClass(
-                $namespace,
-                get_class($instance)
-            );
+        if (empty($parts)) {
+            $namespace = null;
+        } else {
+            $namespace = implode('\\', $parts);
         }
 
-        $name = $binding->getName();
-        $this->dir->createFile($name . '.php', $code);
+        $instance = $binding->getTarget()->getVeneerProxyTargetInstance();
+
+        if (!is_object($instance)) {
+            throw Exceptional::Setup($proxyClass . ' instance has not been bound');
+        }
+
+        $code .= $binding->generateBindingClass(
+            $namespace,
+            get_class($instance)
+        );
+
+        $this->dir->createFile($fileName . '.php', $code);
     }
 }

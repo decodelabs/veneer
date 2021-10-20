@@ -25,12 +25,12 @@ class Binding
     /**
      * @var string
      */
-    protected $name;
+    protected $providerClass;
 
     /**
      * @var string
      */
-    protected $key;
+    protected $proxyClass;
 
 
     /**
@@ -43,19 +43,14 @@ class Binding
      */
     protected $pluginNames = [];
 
-    /**
-     * @var array<string>
-     */
-    protected $aliases = [];
-
 
     /**
      * Init with criteria
      */
-    public function __construct(string $name, string $key)
+    public function __construct(string $providerClass, string $proxyClass)
     {
-        $this->name = $name;
-        $this->key = $key;
+        $this->providerClass = $providerClass;
+        $this->proxyClass = $proxyClass;
     }
 
     /**
@@ -67,18 +62,27 @@ class Binding
     {
         $instance = null;
 
-        if ($container && $container->has($this->key)) {
-            $instance = $container->get($this->key);
+        // Check container for provider
+        if (
+            $container &&
+            $container->has($this->providerClass)
+        ) {
+            $instance = $container->get($this->providerClass);
         }
 
-        if (!$instance && (false !== strpos($this->key, '\\')) && class_exists($this->key)) {
-            $class = $this->key;
+        // Create instance of provider
+        if (
+            !$instance &&
+            (false !== strpos($this->providerClass, '\\')) &&
+            class_exists($this->providerClass)
+        ) {
+            $class = $this->providerClass;
             $instance = new $class();
         }
 
         if (!$instance) {
             throw Exceptional::Runtime(
-                'Could not get instance of ' . $this->key . ' to bind to',
+                'Could not get instance of ' . $this->providerClass . ' to bind to',
                 null,
                 $this
             );
@@ -116,7 +120,7 @@ class Binding
             get_class($instance)
         );
 
-        $class .= 'return new ' . $this->name . '();' . "\n";
+        $class .= 'return new \\DecodeLabs\\Veneer\\Binding\\' . $this->proxyClass . '();' . "\n";
 
         if (Veneer::shouldCacheBindings()) {
             $hash = md5($class);
@@ -148,7 +152,13 @@ class Binding
         $plugins = $consts = [];
         $ref = new ReflectionClass($instanceClass);
         $instName = $ref->getName();
-        $className = $this->name;
+
+        $parts = explode('\\', $this->proxyClass);
+        $className = array_pop($parts);
+
+        if (!empty($parts)) {
+            $namespace .= '\\' . implode('\\', $parts);
+        }
 
         $class =
             'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
@@ -157,7 +167,7 @@ class Binding
             'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
 
 
-        $consts['VENEER'] = 'const VENEER = \'' . $this->name . '\';';
+        $consts['VENEER'] = 'const VENEER = \'' . $this->proxyClass . '\';';
         $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
 
         foreach (array_keys($ref->getConstants()) as $key) {
@@ -299,20 +309,21 @@ class Binding
         }
     }
 
+
     /**
-     * Get facade name
+     * Get container provider class
      */
-    public function getName(): string
+    public function getProviderClass(): string
     {
-        return $this->name;
+        return $this->providerClass;
     }
 
     /**
-     * Get container key
-     */
-    public function getKey(): string
+    * Get facade proxy class
+    */
+    public function getProxyClass(): string
     {
-        return $this->key;
+        return $this->proxyClass;
     }
 
     /**
@@ -322,7 +333,7 @@ class Binding
     {
         if ($this->target === null) {
             throw Exceptional::Runtime(
-                'Proxy ' . $this->name . ' has not been bound to target yet',
+                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
                 null,
                 $this
             );
@@ -340,7 +351,7 @@ class Binding
     {
         if ($this->target === null) {
             throw Exceptional::Runtime(
-                'Proxy ' . $this->name . ' has not been bound to target yet',
+                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
                 null,
                 $this
             );
@@ -356,32 +367,12 @@ class Binding
     {
         if ($this->target === null) {
             throw Exceptional::Runtime(
-                'Proxy ' . $this->name . ' has not been bound to target yet',
+                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
                 null,
                 $this
             );
         }
 
         return in_array($name, $this->pluginNames);
-    }
-
-
-
-    /**
-     * Register alias after loading
-     */
-    public function registerAlias(string $alias): void
-    {
-        $this->aliases[] = $alias;
-    }
-
-    /**
-     * Get list of registered aliases
-     *
-     * @return array<string>
-     */
-    public function getAliases(): array
-    {
-        return $this->aliases;
     }
 }

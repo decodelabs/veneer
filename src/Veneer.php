@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace DecodeLabs;
 
 use DecodeLabs\Veneer\Manager;
-use DecodeLabs\Veneer\Manager\Aliasing as AliasingManager;
 
 use Psr\Container\ContainerInterface;
 
@@ -35,7 +34,7 @@ final class Veneer
     public static function getDefaultManager(): Manager
     {
         if (self::$defaultManager === null) {
-            self::$defaultManager = new AliasingManager();
+            self::$defaultManager = new Manager();
         }
 
         return self::$defaultManager;
@@ -46,22 +45,12 @@ final class Veneer
     /**
      * Register provider
      */
-    public static function register(string $providerClass, string ...$proxyClasses): void
+    public static function register(string $providerClass, string $proxyClass): void
     {
         $manager = self::getDefaultManager();
-        $name = $providerClass;
 
-        if (!empty($proxyClasses)) {
-            $parts = explode('\\', $proxyClasses[0]);
-            $name = array_pop($parts);
-        }
-
-        if (!$manager->has($providerClass)) {
-            $manager->bind($name, $providerClass);
-        }
-
-        foreach ($proxyClasses as $className) {
-            $manager->load($name, $className);
+        if (!$manager->has($proxyClass)) {
+            $manager->bind($providerClass, $proxyClass);
         }
     }
 
