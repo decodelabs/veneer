@@ -156,14 +156,11 @@ class Binding
         $parts = explode('\\', $this->proxyClass);
         $className = array_pop($parts);
 
-        if (!empty($parts)) {
-            if (empty($namespace)) {
-                $namespace = '';
-            } else {
-                $namespace .= '\\';
+        if ($parts !== []) {
+            if ($namespace !== null) {
+                array_unshift($parts, $namespace);
             }
-
-            $namespace .= implode('\\', $parts);
+            $namespace = implode('\\', $parts);
         }
 
         $class =
@@ -192,20 +189,16 @@ class Binding
             $plugins[$name] = 'public static $' . $name . ';';
         }
 
-        if (!empty($plugins)) {
-            $class .= implode("\n", $plugins);
-        }
+        $class .= implode("\n", $plugins);
 
         $class .= '};' . "\n";
 
 
         if ($namespace === null) {
-            $class = 'namespace {' . "\n" . $class . "\n" . '}';
-        } else {
-            $class = 'namespace ' . $namespace . ';' . "\n" . $class;
+            return 'namespace {' . "\n" . $class . "\n" . '}';
         }
 
-        return $class;
+        return 'namespace ' . $namespace . ';' . "\n" . $class;
     }
 
 
