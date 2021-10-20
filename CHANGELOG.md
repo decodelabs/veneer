@@ -1,3 +1,6 @@
+## v0.8.1 (2021-10-20)
+* Fixed stub generator
+
 ## v0.8.0 (2021-10-20)
 * Simplified binding structure
 
