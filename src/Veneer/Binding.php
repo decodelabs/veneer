@@ -157,7 +157,13 @@ class Binding
         $className = array_pop($parts);
 
         if (!empty($parts)) {
-            $namespace .= '\\' . implode('\\', $parts);
+            if (empty($namespace)) {
+                $namespace = '';
+            } else {
+                $namespace .= '\\';
+            }
+
+            $namespace .= implode('\\', $parts);
         }
 
         $class =

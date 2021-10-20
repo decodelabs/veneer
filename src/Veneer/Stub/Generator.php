@@ -44,13 +44,6 @@ PHP;
         $proxyClass = $binding->getProxyClass();
         $parts = explode('\\', $proxyClass);
         $fileName = implode('/', $parts);
-        array_pop($parts);
-
-        if (empty($parts)) {
-            $namespace = null;
-        } else {
-            $namespace = implode('\\', $parts);
-        }
 
         $instance = $binding->getTarget()->getVeneerProxyTargetInstance();
 
@@ -59,7 +52,7 @@ PHP;
         }
 
         $code .= $binding->generateBindingClass(
-            $namespace,
+            null,
             get_class($instance)
         );
 
