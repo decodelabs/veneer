@@ -20,7 +20,7 @@
         "phpunit/phpunit": "^8",
         "phpstan/phpstan": "^0.12.45",
         "decodelabs/phpstan-decodelabs": "^0.4",
-        "symplify/easy-coding-standard": "^8.3",
+        "symplify/easy-coding-standard": "^9.4",
 
         "decodelabs/atlas": "^0.9",
         "decodelabs/terminus": "^0.7"
