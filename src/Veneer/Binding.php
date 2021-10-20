@@ -164,6 +164,8 @@ class Binding
             }
 
             $namespace .= implode('\\', $parts);
+        } elseif ($namespace === '') {
+            $namespace = null;
         }
 
         $class =
@@ -184,18 +186,13 @@ class Binding
             $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
         }
 
-        if (!empty($consts)) {
-            $class .= implode("\n", $consts);
-        }
+        $class .= implode("\n", $consts);
 
         foreach ($this->pluginNames as $name) {
             $plugins[$name] = 'public static $' . $name . ';';
         }
 
-        if (!empty($plugins)) {
-            $class .= implode("\n", $plugins);
-        }
-
+        $class .= implode("\n", $plugins);
         $class .= '};' . "\n";
 
 
