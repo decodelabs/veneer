@@ -80,10 +80,7 @@ class Binding
             $instance = new $class();
         }
 
-        if (
-            !$instance ||
-            !is_object($instance)
-        ) {
+        if (!is_object($instance)) {
             throw Exceptional::Runtime(
                 'Could not get instance of ' . $this->providerClass . ' to bind to',
                 null,
