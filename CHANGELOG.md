@@ -1,3 +1,7 @@
+## v0.8.2 (2022-03-09)
+* Transitioned from Travis to GHA
+* Updated PHPStan and ECS dependencies
+
 ## v0.8.1 (2021-10-20)
 * Fixed stub generator
 
