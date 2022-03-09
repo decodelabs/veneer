@@ -80,7 +80,10 @@ class Binding
             $instance = new $class();
         }
 
-        if (!$instance) {
+        if (
+            !$instance ||
+            !is_object($instance)
+        ) {
             throw Exceptional::Runtime(
                 'Could not get instance of ' . $this->providerClass . ' to bind to',
                 null,
@@ -164,6 +167,8 @@ class Binding
             }
 
             $namespace .= implode('\\', $parts);
+        } elseif ($namespace === '') {
+            $namespace = null;
         }
 
         $class =
@@ -184,18 +189,13 @@ class Binding
             $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
         }
 
-        if (!empty($consts)) {
-            $class .= implode("\n", $consts);
-        }
+        $class .= implode("\n", $consts);
 
         foreach ($this->pluginNames as $name) {
             $plugins[$name] = 'public static $' . $name . ';';
         }
 
-        if (!empty($plugins)) {
-            $class .= implode("\n", $plugins);
-        }
-
+        $class .= implode("\n", $plugins);
         $class .= '};' . "\n";
 
 
