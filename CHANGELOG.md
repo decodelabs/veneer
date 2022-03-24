@@ -1,3 +1,6 @@
+## v0.8.3 (2022-03-24)
+* Added lazy loading support
+
 ## v0.8.2 (2022-03-09)
 * Transitioned from Travis to GHA
 * Updated PHPStan and ECS dependencies
