@@ -1,3 +1,6 @@
+## v0.8.4 (2022-03-24)
+* Defer target construction until after binding
+
 ## v0.8.3 (2022-03-24)
 * Added lazy loading support
 
