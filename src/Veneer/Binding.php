@@ -253,7 +253,7 @@ class Binding
                 return $output;
             };
 
-            $this->target::$$name = new class ($loader) implements Dumpable {
+            $this->target::$$name = new class($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
                 /**
