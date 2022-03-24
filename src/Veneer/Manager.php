@@ -29,6 +29,7 @@ class Manager
     public function __construct(?ContainerInterface $container = null)
     {
         $this->setContainer($container);
+        spl_autoload_register([$this, 'handleAutoload']);
     }
 
 
@@ -50,10 +51,28 @@ class Manager
 
 
     /**
-     * Add alias that can be used from root namespace
+     * Handle autoload
      */
-    public function bind(string $providerClass, string $proxyClass): bool
+    public function handleAutoload(string $class): void
     {
+        if (!isset($this->bindings[$class])) {
+            return;
+        }
+
+        $this->bindProxy($this->bindings[$class]);
+    }
+
+
+    /**
+     * Add alias that can be used from root namespace
+     *
+     * @phpstan-param class-string $providerClass
+     * @phpstan-param class-string $proxyClass
+     */
+    public function bind(
+        string $providerClass,
+        string $proxyClass
+    ): bool {
         if (class_exists($proxyClass, false)) {
             return false;
         }
@@ -61,14 +80,24 @@ class Manager
         $binding = new Binding($providerClass, $proxyClass);
         $this->bindings[$binding->getProxyClass()] = $binding;
 
+        if (!$binding->isLazyLoader()) {
+            $this->bindProxy($binding);
+        }
+
+        return true;
+    }
+
+    /**
+     * Bind proxy
+     */
+    protected function bindProxy(Binding $binding): void
+    {
         if (!$binding->hasInstance()) {
             $binding->bindInstance($this->container);
         }
 
         $bindingClass = get_class($binding->getTarget());
-        class_alias($bindingClass, $proxyClass);
-
-        return true;
+        class_alias($bindingClass, $binding->getProxyClass());
     }
 
     /**

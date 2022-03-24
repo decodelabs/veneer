@@ -44,9 +44,14 @@ final class Veneer
 
     /**
      * Register provider
+     *
+     * @phpstan-param class-string $providerClass
+     * @phpstan-param class-string $proxyClass
      */
-    public static function register(string $providerClass, string $proxyClass): void
-    {
+    public static function register(
+        string $providerClass,
+        string $proxyClass
+    ): void {
         $manager = self::getDefaultManager();
 
         if (!$manager->has($proxyClass)) {

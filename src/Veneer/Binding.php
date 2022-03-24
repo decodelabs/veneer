@@ -23,12 +23,12 @@ use ReflectionClass;
 class Binding
 {
     /**
-     * @var string
+     * @phpstan-var class-string
      */
     protected $providerClass;
 
     /**
-     * @var string
+     * @phpstan-var class-string
      */
     protected $proxyClass;
 
@@ -46,12 +46,28 @@ class Binding
 
     /**
      * Init with criteria
+     *
+     * @phpstan-param class-string $providerClass
+     * @phpstan-param class-string $proxyClass
      */
-    public function __construct(string $providerClass, string $proxyClass)
-    {
+    public function __construct(
+        string $providerClass,
+        string $proxyClass
+    ) {
         $this->providerClass = $providerClass;
         $this->proxyClass = $proxyClass;
     }
+
+
+    /**
+     * Is provider lazy loader
+     */
+    public function isLazyLoader(): bool
+    {
+        $ref = new ReflectionClass($this->providerClass);
+        return $ref->implementsInterface(LazyLoader::class);
+    }
+
 
     /**
      * Extract target object
@@ -80,10 +96,7 @@ class Binding
             $instance = new $class();
         }
 
-        if (
-            !$instance ||
-            !is_object($instance)
-        ) {
+        if (!is_object($instance)) {
             throw Exceptional::Runtime(
                 'Could not get instance of ' . $this->providerClass . ' to bind to',
                 null,
@@ -240,7 +253,7 @@ class Binding
                 return $output;
             };
 
-            $this->target::$$name = new class($loader) implements Dumpable {
+            $this->target::$$name = new class ($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
                 /**
