@@ -19,6 +19,7 @@ use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
 use Psr\Container\ContainerInterface;
 
 use ReflectionClass;
+use ReflectionObject;
 
 class Binding
 {
@@ -37,6 +38,11 @@ class Binding
      * @var Proxy|null
      */
     protected $target;
+
+    /**
+     * @var bool
+     */
+    protected $deferred = false;
 
     /**
      * @var array<string>
@@ -68,6 +74,33 @@ class Binding
         return $ref->implementsInterface(LazyLoader::class);
     }
 
+    /**
+     * Is deferred
+     */
+    public function isDeferred(): bool
+    {
+        return $this->deferred;
+    }
+
+    /**
+     * Resolve deferral
+     */
+    public function resolveDeferral(): void
+    {
+        if (
+            !$this->deferred ||
+            !$this->target ||
+            null === ($instance = $this->target::getVeneerProxyTargetInstance())
+        ) {
+            return;
+        }
+
+        $ref = new ReflectionObject($instance);
+        $method = $ref->getMethod('__construct');
+        $this->deferred = false;
+        $method->invoke($instance);
+    }
+
 
     /**
      * Extract target object
@@ -77,6 +110,7 @@ class Binding
     public function bindInstance(?ContainerInterface $container): Binding
     {
         $instance = null;
+        $this->deferred = false;
 
         // Check container for provider
         if (
@@ -92,8 +126,9 @@ class Binding
             (false !== strpos($this->providerClass, '\\')) &&
             class_exists($this->providerClass)
         ) {
-            $class = $this->providerClass;
-            $instance = new $class();
+            $ref = new ReflectionClass($this->providerClass);
+            $instance = $ref->newInstanceWithoutConstructor();
+            $this->deferred = $ref->hasMethod('__construct');
         }
 
         if (!is_object($instance)) {
@@ -110,7 +145,7 @@ class Binding
             $this->pluginNames = [];
         }
 
-        $this->target = $this->createBindingClass($instance);
+        $this->target = $this->createBindingClass(get_class($instance));
         $this->target::setVeneerProxyTargetInstance($instance);
 
         $this->loadPlugins($this->pluginNames);
@@ -128,12 +163,14 @@ class Binding
 
     /**
      * Create binding class
+     *
+     * @phpstan-param class-string $instanceClass
      */
-    private function createBindingClass(object $instance): Proxy
+    private function createBindingClass(string $instanceClass): Proxy
     {
         $class = $this->generateBindingClass(
             'DecodeLabs\\Veneer\\Binding',
-            get_class($instance)
+            $instanceClass
         );
 
         $class .= 'return new \\DecodeLabs\\Veneer\\Binding\\' . $this->proxyClass . '();' . "\n";
@@ -253,7 +290,7 @@ class Binding
                 return $output;
             };
 
-            $this->target::$$name = new class ($loader) implements Dumpable {
+            $this->target::$$name = new class($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
                 /**

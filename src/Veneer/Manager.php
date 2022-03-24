@@ -98,6 +98,10 @@ class Manager
 
         $bindingClass = get_class($binding->getTarget());
         class_alias($bindingClass, $binding->getProxyClass());
+
+        if ($binding->isDeferred()) {
+            $binding->resolveDeferral();
+        }
     }
 
     /**
