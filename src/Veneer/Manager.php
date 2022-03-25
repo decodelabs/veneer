@@ -24,6 +24,11 @@ class Manager
     protected $container;
 
     /**
+     * @var bool
+     */
+    protected $deferrals = true;
+
+    /**
      * Init with container and loader
      */
     public function __construct(?ContainerInterface $container = null)
@@ -64,6 +69,15 @@ class Manager
 
 
     /**
+     * Set deferral resolution on or off
+     */
+    public function setDeferrals(bool $flag): void
+    {
+        $this->deferrals = $flag;
+    }
+
+
+    /**
      * Add alias that can be used from root namespace
      *
      * @phpstan-param class-string $providerClass
@@ -99,7 +113,10 @@ class Manager
         $bindingClass = get_class($binding->getTarget());
         class_alias($bindingClass, $binding->getProxyClass());
 
-        if ($binding->isDeferred()) {
+        if (
+            $binding->isDeferred() &&
+            $this->deferrals
+        ) {
             $binding->resolveDeferral();
         }
     }
