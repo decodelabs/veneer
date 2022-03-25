@@ -1,3 +1,6 @@
+## v0.8.5 (2022-03-25)
+* Allow disabling deferrals for PHPStan
+
 ## v0.8.4 (2022-03-24)
 * Defer target construction until after binding
 
