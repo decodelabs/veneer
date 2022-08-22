@@ -198,7 +198,7 @@ class Binding
     /**
      * Generate binding class definition
      *
-     * @param class-string $instanceClass
+     * @phpstan-param class-string $instanceClass
      */
     public function generateBindingClass(?string $namespace, string $instanceClass): string
     {
@@ -290,7 +290,7 @@ class Binding
                 return $output;
             };
 
-            $this->target::$$name = new class($loader) implements Dumpable {
+            $this->target::$$name = new class ($loader) implements Dumpable {
                 public const VENEER_PLUGIN = true;
 
                 /**
