@@ -9,21 +9,19 @@
         "email": "tom@inflatablecookie.com"
     }],
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^8.0",
 
-        "decodelabs/exceptional": "^0.3",
-        "decodelabs/glitch-support": "^0.3",
+        "decodelabs/exceptional": "^0.4",
+        "decodelabs/glitch-support": "^0.4",
 
-        "psr/container": "^1"
+        "psr/container": "^2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8",
+        "phpunit/phpunit": "^9",
         "phpstan/phpstan": "^1",
-        "decodelabs/phpstan-decodelabs": "^0.5",
-        "symplify/easy-coding-standard": "^10",
+        "symplify/easy-coding-standard": "^11",
 
-        "decodelabs/atlas": "^0.9",
-        "decodelabs/terminus": "^0.7"
+        "decodelabs/phpstan-decodelabs": "^0.6"
     },
     "autoload": {
         "psr-4": {
@@ -35,7 +33,12 @@
     ],
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.8.x-dev"
+            "dev-develop": "0.9.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
         }
     },
     "scripts": {

@@ -1,3 +1,10 @@
+## v0.9.0 (2022-08-22)
+* Removed PHP7 compatibility
+* Moved Stub Generator out of PHPStan scope
+* Updated PSR Container interface to v2
+* Updated ECS to v11
+* Updated PHPUnit to v9
+
 ## v0.8.5 (2022-03-25)
 * Allow disabling deferrals for PHPStan
 
