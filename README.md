@@ -15,13 +15,6 @@ Create automated static frontages for your PHP objects.
 composer require decodelabs/veneer
 ```
 
-### PHP version
-
-_Please note, the final v1 releases of all Decode Labs libraries will target **PHP8** or above._
-
-Current support for earlier versions of PHP will be phased out in the coming months.
-
-
 ## Usage
 Say you have a common library class you use regularly:
 
