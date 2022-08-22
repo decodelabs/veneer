@@ -21,9 +21,7 @@
         "phpstan/phpstan": "^1",
         "symplify/easy-coding-standard": "^11",
 
-        "decodelabs/phpstan-decodelabs": "^0.6",
-        "decodelabs/atlas": "^0.9|^0.10-dev",
-        "decodelabs/terminus": "^0.7|^0.8-dev"
+        "decodelabs/phpstan-decodelabs": "^0.6"
     },
     "autoload": {
         "psr-4": {

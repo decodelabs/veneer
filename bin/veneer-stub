@@ -37,7 +37,7 @@ if (!class_exists(Cli::class)) {
 }
 
 // Load source generator
-if (is_file($genPath = __DIR__ . '/../src/Veneer/Stub/Generator.php')) {
+if (is_file($genPath = __DIR__ . '/../lib/Veneer/Stub/Generator.php')) {
     require_once $genPath;
 }
 
