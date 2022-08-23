@@ -13,10 +13,7 @@ use DecodeLabs\Exceptional;
 
 trait ProxyTrait
 {
-    /**
-     * @var mixed
-     */
-    public static $instance;
+    public static ?object $instance = null;
 
     /**
      * Set Veneer Proxy target instance
@@ -37,8 +34,10 @@ trait ProxyTrait
     /**
      * Passthrough all static calls to instance
      */
-    public static function __callStatic(string $name, array $args)
-    {
+    public static function __callStatic(
+        string $name,
+        array $args
+    ): mixed {
         if (!self::$instance) {
             throw Exceptional::Runtime(
                 'No target object has been bound in ' . $name . ' proxy'

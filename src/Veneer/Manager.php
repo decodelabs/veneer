@@ -16,17 +16,10 @@ class Manager
     /**
      * @var array<string, Binding>
      */
-    protected $bindings = [];
+    protected array $bindings = [];
 
-    /**
-     * @var ContainerInterface|null
-     */
-    protected $container;
-
-    /**
-     * @var bool
-     */
-    protected $deferrals = true;
+    protected ?ContainerInterface $container = null;
+    protected bool $deferrals = true;
 
     /**
      * Init with container and loader
@@ -132,8 +125,10 @@ class Manager
     /**
      * Has class been bound with plugin?
      */
-    public function hasPlugin(string $proxyClass, string $pluginName): bool
-    {
+    public function hasPlugin(
+        string $proxyClass,
+        string $pluginName
+    ): bool {
         if (!$binding = ($this->bindings[$proxyClass] ?? null)) {
             return false;
         }

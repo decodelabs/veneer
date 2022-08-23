@@ -16,7 +16,9 @@ interface Proxy
 
     /**
      * @param array<mixed> $args
-     * @return mixed
      */
-    public static function __callStatic(string $name, array $args);
+    public static function __callStatic(
+        string $name,
+        array $args
+    ): mixed;
 }
