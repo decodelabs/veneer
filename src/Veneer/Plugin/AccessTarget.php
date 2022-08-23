@@ -14,5 +14,9 @@ use DecodeLabs\Veneer\Plugin;
 interface AccessTarget extends Provider
 {
     public function __get(string $name): Plugin;
-    public function cacheLoadedVeneerPlugin(string $name, Plugin $plugin): void;
+
+    public function cacheLoadedVeneerPlugin(
+        string $name,
+        Plugin $plugin
+    ): void;
 }

@@ -26,28 +26,20 @@ class Binding
     /**
      * @phpstan-var class-string
      */
-    protected $providerClass;
+    protected string $providerClass;
 
     /**
      * @phpstan-var class-string
      */
-    protected $proxyClass;
+    protected string $proxyClass;
 
-
-    /**
-     * @var Proxy|null
-     */
-    protected $target;
-
-    /**
-     * @var bool
-     */
-    protected $deferred = false;
+    protected ?Proxy $target = null;
+    protected bool $deferred = false;
 
     /**
      * @var array<string>
      */
-    protected $pluginNames = [];
+    protected array $pluginNames = [];
 
 
     /**
@@ -200,8 +192,10 @@ class Binding
      *
      * @phpstan-param class-string $instanceClass
      */
-    public function generateBindingClass(?string $namespace, string $instanceClass): string
-    {
+    public function generateBindingClass(
+        ?string $namespace,
+        string $instanceClass
+    ): string {
         $plugins = $consts = [];
         $ref = new ReflectionClass($instanceClass);
         $instName = $ref->getName();

@@ -13,7 +13,10 @@ use DecodeLabs\Veneer\Plugin;
 
 trait AccessTargetTrait
 {
-    protected $plugins = [];
+    /**
+     * @var array<string, Plugin>
+     */
+    protected array $plugins = [];
 
     /**
      * Load local object plugin
@@ -27,8 +30,10 @@ trait AccessTargetTrait
         return $this->plugins[$name];
     }
 
-    public function cacheLoadedVeneerPlugin(string $name, Plugin $plugin): void
-    {
+    public function cacheLoadedVeneerPlugin(
+        string $name,
+        Plugin $plugin
+    ): void {
         $this->plugins[$name] = $plugin;
     }
 }

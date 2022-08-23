@@ -15,10 +15,7 @@ use Psr\Container\ContainerInterface;
 
 final class Veneer
 {
-    /**
-     * @var Manager|null
-     */
-    private static $defaultManager;
+    private static ?Manager $defaultManager = null;
 
     /**
      * Set default manager
