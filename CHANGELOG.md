@@ -1,3 +1,6 @@
+## v0.9.2 (2022-08-23)
+* Added concrete types to all members
+
 ## v0.9.1 (2022-08-23)
 * Updated Stub Generator testing
 
