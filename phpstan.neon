@@ -3,6 +3,8 @@ includes:
 parameters:
     paths:
         - src
+    excludePaths:
+        - src/Veneer/Stub/*
     level: max
     #ignoreErrors:
      #   - '#Access to an undefined static property DecodeLabs\\Veneer\\Facade::\$instance#'

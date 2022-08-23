@@ -1,3 +1,6 @@
+## v0.9.1 (2022-08-23)
+* Updated Stub Generator testing
+
 ## v0.9.0 (2022-08-22)
 * Removed PHP7 compatibility
 * Moved Stub Generator out of PHPStan scope
