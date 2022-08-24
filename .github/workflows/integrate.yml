@@ -145,7 +145,7 @@ jobs:
           dependency-versions: "highest"
 
       - name: "Check coding style"
-        run: "composer run-script --no-interaction psr12"
+        run: "composer run-script --no-interaction ecs"
 
   exported_files:
     name: "5️⃣ Exported files"

@@ -219,7 +219,7 @@ class Binding
             'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
             'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
             'use ' . $instName . ' as Inst;' . "\n" .
-            'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
+            'class ' . $className . ' implements Proxy { use ProxyTrait;' . "\n";
 
 
         $consts['VENEER'] = 'const VENEER = \'' . $this->proxyClass . '\';';
