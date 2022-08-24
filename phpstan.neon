@@ -2,9 +2,9 @@ includes:
     - ./vendor/decodelabs/phpstan-decodelabs/extension.neon
 parameters:
     paths:
-        - src
+        - src/
     excludePaths:
-        - src/Veneer/Stub/*
+        - src/Veneer/Stub/
     level: max
     #ignoreErrors:
-     #   - '#Access to an undefined static property DecodeLabs\\Veneer\\Facade::\$instance#'
+    #    - '#Access to an undefined static property DecodeLabs\\Veneer\\Facade::\$instance#'
