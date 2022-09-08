@@ -1,3 +1,4 @@
+* Removed trailing space from stubs
 * Updated CI environment
 
 ## v0.9.2 (2022-08-23)
