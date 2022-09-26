@@ -159,4 +159,22 @@ class Manager
 
         return $output;
     }
+
+    /**
+     * Get single binding
+     */
+    public function getBinding(string $name): ?Binding
+    {
+        if (!isset($this->bindings[$name])) {
+            return null;
+        }
+
+        $binding = $this->bindings[$name];
+
+        if (!$binding->hasInstance()) {
+            $binding->bindInstance($this->container);
+        }
+
+        return $binding;
+    }
 }

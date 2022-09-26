@@ -10,11 +10,10 @@
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
-use DecodeLabs\Glitch\Dumpable;
+
 
 use DecodeLabs\Veneer;
-use DecodeLabs\Veneer\Plugin\AccessTarget as PluginAccessTarget;
-use DecodeLabs\Veneer\Plugin\Provider as PluginProvider;
+use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 
 use Psr\Container\ContainerInterface;
 
@@ -37,9 +36,9 @@ class Binding
     protected bool $deferred = false;
 
     /**
-     * @var array<string>
+     * @var array<string, Plugin>|null
      */
-    protected array $pluginNames = [];
+    protected ?array $plugins = null;
 
 
     /**
@@ -63,7 +62,8 @@ class Binding
     public function isLazyLoader(): bool
     {
         $ref = new ReflectionClass($this->providerClass);
-        return $ref->implementsInterface(LazyLoader::class);
+        $attributes = $ref->getAttributes(LazyLoad::class);
+        return !empty($attributes);
     }
 
     /**
@@ -87,10 +87,15 @@ class Binding
             return;
         }
 
+        $this->deferred = false;
+
+        // Call constructor
         $ref = new ReflectionObject($instance);
         $method = $ref->getMethod('__construct');
-        $this->deferred = false;
         $method->invoke($instance);
+
+        // Load plugins
+        $this->loadPlugins();
     }
 
 
@@ -123,6 +128,7 @@ class Binding
             $this->deferred = $ref->hasMethod('__construct');
         }
 
+        // Check instance
         if (!is_object($instance)) {
             throw Exceptional::Runtime(
                 'Could not get instance of ' . $this->providerClass . ' to bind to',
@@ -131,19 +137,21 @@ class Binding
             );
         }
 
-        if ($instance instanceof PluginProvider) {
-            $this->pluginNames = $instance->getVeneerPluginNames();
-        } else {
-            $this->pluginNames = [];
-        }
+        // Load plugin names
+        $this->scanPlugins($instance);
 
+        // Create target
         $this->target = $this->createBindingClass(get_class($instance));
         $this->target::setVeneerProxyTargetInstance($instance);
 
-        $this->loadPlugins($this->pluginNames);
+        if (!$this->deferred) {
+            $this->loadPlugins();
+        }
 
         return $this;
     }
+
+
 
     /**
      * Has instance been bound to target
@@ -219,7 +227,7 @@ class Binding
             'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
             'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
             'use ' . $instName . ' as Inst;' . "\n" .
-            'class ' . $className . ' implements Proxy { use ProxyTrait; ' . "\n";
+            'class ' . $className . ' implements Proxy { use ProxyTrait;' . "\n";
 
 
         $consts['VENEER'] = 'const VENEER = \'' . $this->proxyClass . '\';';
@@ -235,7 +243,7 @@ class Binding
 
         $class .= implode("\n", $consts);
 
-        foreach ($this->pluginNames as $name) {
+        foreach ($this->getPluginNames() as $name) {
             $plugins[$name] = 'public static $' . $name . ';';
         }
 
@@ -253,111 +261,6 @@ class Binding
     }
 
 
-
-
-
-    /**
-     * Load plugins from target
-     *
-     * @param array<string> $pluginNames
-     */
-    private function loadPlugins(array $pluginNames): void
-    {
-        foreach ($pluginNames as $name) {
-            $loader = function () use ($name) {
-                if ($this->target === null) {
-                    throw Exceptional::Setup('Target binding has not been created');
-                }
-
-                $instance = $this->target::getVeneerProxyTargetInstance();
-
-                if (!$instance instanceof PluginProvider) {
-                    return null;
-                }
-
-                $output = $instance->loadVeneerPlugin($name);
-
-                if ($instance instanceof PluginAccessTarget) {
-                    $instance->cacheLoadedVeneerPlugin($name, $output);
-                }
-
-                return $output;
-            };
-
-            $this->target::$$name = new class($loader) implements Dumpable {
-                public const VENEER_PLUGIN = true;
-
-                /**
-                 * @var callable
-                 */
-                protected $loader;
-
-                /**
-                 * @var Plugin|null
-                 */
-                protected $plugin;
-
-
-                /**
-                 * Init with loader
-                 */
-                public function __construct(callable $loader)
-                {
-                    $this->loader = $loader;
-                }
-
-
-                /**
-                 * @return mixed
-                 */
-                public function __get(string $name)
-                {
-                    if ($this->plugin === null) {
-                        $this->loadPlugin();
-                    }
-
-                    return $this->plugin->{$name};
-                }
-
-
-                /**
-                 * @param array<mixed> $args
-                 * @return mixed
-                 */
-                public function __call(string $name, array $args)
-                {
-                    if ($this->plugin === null) {
-                        $this->loadPlugin();
-                    }
-
-                    return $this->plugin->{$name}(...$args);
-                }
-
-
-                private function loadPlugin(): void
-                {
-                    $loader = $this->loader;
-                    $this->plugin = $loader();
-                }
-
-
-                /**
-                 * Export for dump inspection
-                 *
-                 * @return iterable<string, mixed>
-                 */
-                public function glitchDump(): iterable
-                {
-                    if ($this->plugin === null) {
-                        $this->loadPlugin();
-                    }
-
-                    yield 'className' => '@PluginWrapper';
-                    yield 'value' => $this->plugin;
-                }
-            };
-        }
-    }
 
 
     /**
@@ -392,6 +295,25 @@ class Binding
         return $this->target;
     }
 
+
+    /**
+     * Get plugins
+     *
+     * @return array<string, Plugin>
+     */
+    public function getPlugins(): array
+    {
+        if ($this->plugins === null) {
+            throw Exceptional::Runtime(
+                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
+                null,
+                $this
+            );
+        }
+
+        return $this->plugins;
+    }
+
     /**
      * Get plugin names
      *
@@ -399,15 +321,7 @@ class Binding
      */
     public function getPluginNames(): array
     {
-        if ($this->target === null) {
-            throw Exceptional::Runtime(
-                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
-                null,
-                $this
-            );
-        }
-
-        return $this->pluginNames;
+        return array_keys($this->getPlugins());
     }
 
     /**
@@ -415,14 +329,58 @@ class Binding
      */
     public function hasPlugin(string $name): bool
     {
-        if ($this->target === null) {
-            throw Exceptional::Runtime(
-                'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
-                null,
-                $this
-            );
-        }
+        return in_array($name, $this->getPluginNames());
+    }
 
-        return in_array($name, $this->pluginNames);
+
+
+    /**
+     * Find list of plugin names
+     */
+    private function scanPlugins(object $instance): void
+    {
+        $this->plugins = [];
+
+        $ref = new ReflectionClass($this->providerClass);
+        $props = $ref->getProperties();
+
+        foreach ($props as $property) {
+            $pluginAttr = $property->getAttributes(Plugin::class);
+
+            if (empty($pluginAttr)) {
+                continue;
+            }
+
+            $plugin = $pluginAttr[0]->newInstance();
+            $plugin->setProperty($property);
+
+            $this->plugins[$plugin->getName()] = $plugin;
+        }
+    }
+
+
+
+    /**
+     * Load plugins from target
+     */
+    private function loadPlugins(): void
+    {
+        foreach ($this->getPlugins() as $name => $plugin) {
+            $loader = function () use ($name, $plugin) {
+                if ($this->target === null) {
+                    throw Exceptional::Setup('Target binding has not been created');
+                }
+
+                /** @var object $instance */
+                $instance = $this->target::getVeneerProxyTargetInstance();
+                return $this->target::$$name = $plugin->load($instance);
+            };
+
+            if ($plugin->isLazy()) {
+                $this->target::$$name = new PluginWrapper($loader);
+            } else {
+                $loader();
+            }
+        }
     }
 }

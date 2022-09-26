@@ -3,7 +3,7 @@
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/veneer?style=flat)](https://packagist.org/packages/decodelabs/veneer)
 [![Latest Version](https://img.shields.io/packagist/v/decodelabs/veneer.svg?style=flat)](https://packagist.org/packages/decodelabs/veneer)
 [![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/veneer.svg?style=flat)](https://packagist.org/packages/decodelabs/veneer)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/decodelabs/veneer/PHP%20Composer)](https://github.com/decodelabs/veneer/actions/workflows/php.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/decodelabs/veneer/Integrate)](https://github.com/decodelabs/veneer/actions/workflows/integrate.yml)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat)](https://github.com/phpstan/phpstan)
 [![License](https://img.shields.io/packagist/l/decodelabs/veneer?style=flat)](https://packagist.org/packages/decodelabs/veneer)
 
@@ -61,44 +61,27 @@ namespace Some\Other\Code
 
 Unfortunately PHP still doesn't have <code>\__getStatic()</code> yet so we have to statically declare plugin names at binding time, but they're still useful for creating more expansive interfaces.
 
-Define two methods on your <code>FacadeTarget</code>
+Define plugins as properties on your <code>FacadeTarget</code> with a <code>Plugin</code> attribute, include <code>LazyLoad</code> attribute too if it doesn't need to be loaded straight away.
 
 
 ```php
 namespace My\Library
 {
     use DecodeLabs\Veneer\Plugin;
-    use DecodeLabs\Veneer\Plugin\Provider;
-    use DecodeLabs\Veneer\Plugin\ProviderTrait;
+    use DecodeLabs\Veneer\LazyLoad;
 
-    class MyThing implements Provider {
+    class MyThing {
 
-        use ProviderTrait;
+        #[Plugin]
+        #[LazyLoad]
+        public MyPlugin $plugin;
+    }
 
-        public function getVeneerPluginNames(): array {
-            // Return the list of plugin names to be accessed from the facade
-            return [
-                'plugin1',
-                'plugin2'
-            ];
-        }
 
-        public function loadVeneerPlugin(string $name): Plugin {
-            // Load plugin object (must implement Plugin)
-
-            // This is just a quick example using anonymous classes:
-            return new class($name) implements Plugin {
-
-                public $name;
-
-                public function __construct(string $name) {
-                    $this->name = $name;
-                }
-
-                public function doAThing() {
-                    echo 'Hello from '.$this->name;
-                }
-            }
+    class MyPlugin
+    {
+        public function doAThing(): string {
+            return 'Hello from plugin1';
         }
     }
 }
@@ -107,7 +90,7 @@ namespace Some\Other\Code
 {
     use My\Library\MyThing;
 
-    MyThing::$plugin1->doAThing(); // Hello from plugin1
+    MyThing::$plugin->doAThing(); // Hello from plugin1
 }
 ```
 
