@@ -9,6 +9,12 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer;
 
-interface LazyLoader
+use Attribute;
+
+#[Attribute(
+    Attribute::TARGET_CLASS |
+    Attribute::TARGET_PROPERTY
+)]
+class LazyLoad
 {
 }
