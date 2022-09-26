@@ -1,3 +1,6 @@
+## v0.10.0 (2022-09-27)
+* Converted Plugin handling to use Attributes
+* Enabled direct loading of Plugins
 * Removed trailing space from stubs
 * Updated CI environment
 
