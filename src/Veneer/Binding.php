@@ -463,7 +463,10 @@ class Binding
 
         if (
             $type->allowsNull() &&
-            $output !== 'mixed'
+            $output !== 'mixed' &&
+            $output !== 'null' &&
+            $output !== 'true' &&
+            $output !== 'false'
         ) {
             $output = '?' . $output;
         }
