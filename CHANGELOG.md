@@ -1,3 +1,6 @@
+## v0.10.1 (2022-09-27)
+* Improved stub generator
+
 ## v0.10.0 (2022-09-27)
 * Converted Plugin handling to use Attributes
 * Enabled direct loading of Plugins
