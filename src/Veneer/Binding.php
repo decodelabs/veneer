@@ -210,7 +210,7 @@ class Binding
 
         $parts = explode('\\', $this->proxyClass);
         $className = array_pop($parts);
-
+\PHPStan\dumpType($parts);
         if (!empty($parts)) {
             if (empty($namespace)) {
                 $namespace = '';
