@@ -11,21 +11,51 @@ namespace DecodeLabs\Veneer\Stub;
 
 use DecodeLabs\Atlas\Dir;
 use DecodeLabs\Exceptional;
+use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Binding;
+
+use ReflectionClass;
 
 class Generator
 {
-    /**
-     * @var Dir
-     */
-    protected $dir;
+    protected Dir $scanDir;
+    protected Dir $stubDir;
 
     /**
      * Init with stub directory location
      */
-    public function __construct(Dir $dir)
+    public function __construct(
+        Dir $scanDir,
+        Dir $stubDir
+    ) {
+        $this->scanDir = $scanDir;
+        $this->stubDir = $stubDir;
+    }
+
+    /**
+     * Scan for bindings
+     *
+     * @return array<Binding>
+     */
+    public function scan(): array
     {
-        $this->dir = $dir;
+        $manager = Veneer::getDefaultManager();
+
+        foreach ($manager->getBindings() as $binding) {
+            $ref = new ReflectionClass($binding->getProviderClass());
+
+            if (!$file = $ref->getFileName()) {
+                continue;
+            }
+
+            if (0 !== strpos($file, (string)$this->scanDir)) {
+                continue;
+            }
+
+            $bindings[] = $binding;
+        }
+
+        return $bindings;
     }
 
     /**
@@ -53,9 +83,11 @@ PHP;
 
         $code .= $binding->generateBindingClass(
             null,
-            get_class($instance)
+            get_class($instance),
+            true
         );
 
-        $this->dir->createFile($fileName . '.php', $code);
+        $this->stubDir->ensureExists();
+        $this->stubDir->createFile($fileName . '.php', $code);
     }
 }
