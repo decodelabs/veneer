@@ -9,36 +9,33 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer\Plugin;
 
+use Closure;
 use DecodeLabs\Glitch\Dumpable;
 
+/**
+ * @template T of object
+ * @mixin T
+ */
 class Wrapper implements Dumpable
 {
-    public const VENEER_PLUGIN = true;
+    protected Closure $loader;
 
     /**
-     * @var callable
+     * @var T|null
      */
-    protected $loader;
-
-    /**
-     * @var object|null
-     */
-    protected $plugin;
+    protected ?object $plugin = null;
 
 
     /**
      * Init with loader
      */
-    public function __construct(callable $loader)
+    public function __construct(Closure $loader)
     {
         $this->loader = $loader;
     }
 
 
-    /**
-     * @return mixed
-     */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if ($this->plugin === null) {
             $this->loadPlugin();
@@ -50,10 +47,11 @@ class Wrapper implements Dumpable
 
     /**
      * @param array<mixed> $args
-     * @return mixed
      */
-    public function __call(string $name, array $args)
-    {
+    public function __call(
+        string $name,
+        array $args
+    ): mixed {
         if ($this->plugin === null) {
             $this->loadPlugin();
         }
