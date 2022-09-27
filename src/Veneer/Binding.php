@@ -242,6 +242,10 @@ class Binding
         $uses[$instName] = 'Inst';
         $wrapper = false;
 
+        if ($listMethods) {
+            $properties['instance'] = 'public static Inst $instance;';
+        }
+
         foreach ($plugins as $name => $plugin) {
             $uses[$plugin->getType()] = ucfirst($name) . 'Plugin';
             $type = ucfirst($name) . 'Plugin';
@@ -336,8 +340,13 @@ class Binding
         $methods = [];
 
         foreach ($ref->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $string = 'public static function ';
             $name = $method->getName();
+
+            if (substr($name, 0, 2) === '__') {
+                continue;
+            }
+
+            $string = 'public static function ';
             $string .= $name . '(';
             $params = [];
 
@@ -355,7 +364,15 @@ class Binding
                 $param .= '$' . $parameter->getName();
 
                 if ($parameter->isDefaultValueAvailable()) {
-                    $param .= ' = ' . var_export($parameter->getDefaultValue(), true);
+                    $default = $parameter->getDefaultValue();
+
+                    if ($default === []) {
+                        $exp = '[]';
+                    } else {
+                        $exp = var_export($default, true);
+                    }
+
+                    $param .= ' = ' . $exp;
                 }
 
                 $params[] = $param;
@@ -364,10 +381,25 @@ class Binding
             $string .= implode(', ', $params) . ')';
 
             if (null !== ($type = $method->getReturnType())) {
-                $string .= ': ' . $this->exportType($type, $uses) . ' ';
+                $type = $this->exportType($type, $uses);
+                $string .= ': ' . $type . ' ';
             }
 
-            $string .= '{}';
+            $string .= '{';
+
+            if ($type !== 'void') {
+                $string .= "\n";
+                $string .= '        return static::$instance->' . $name . '(';
+
+                if (!empty($params)) {
+                    $string .= '...func_get_args()';
+                }
+
+                $string .= ');' . "\n";
+                $string .= '    ';
+            }
+
+            $string .= '}';
 
             $methods[$name] = $string;
         }
@@ -428,7 +460,10 @@ class Binding
             }
         }
 
-        if ($type->allowsNull()) {
+        if (
+            $type->allowsNull() &&
+            $output !== 'mixed'
+        ) {
             $output = '?' . $output;
         }
 
