@@ -18,8 +18,12 @@ use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
 use ReflectionClass;
+use ReflectionIntersectionType;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionObject;
+use ReflectionType;
+use ReflectionUnionType;
 
 class Binding
 {
@@ -229,17 +233,17 @@ class Binding
         // Initialization
         $plugins = $this->getPlugins();
         $properties = $consts = $uses = [];
-        $class = '';
+        $class = $methodDef = '';
 
 
         // Uses
-        $uses[] = 'DecodeLabs\\Veneer\\Proxy';
-        $uses[] = 'DecodeLabs\\Veneer\\ProxyTrait';
-        $uses[] = $instName . ' as Inst';
+        $uses['DecodeLabs\\Veneer\\Proxy'] = null;
+        $uses['DecodeLabs\\Veneer\\ProxyTrait'] = null;
+        $uses[$instName] = 'Inst';
         $wrapper = false;
 
         foreach ($plugins as $name => $plugin) {
-            $uses[] = $plugin->getType() . ' as ' . ucfirst($name) . 'Plugin';
+            $uses[$plugin->getType()] = ucfirst($name) . 'Plugin';
             $type = ucfirst($name) . 'Plugin';
 
             if ($plugin->isLazy()) {
@@ -251,22 +255,26 @@ class Binding
         }
 
         if ($wrapper) {
-            $uses[] = 'DecodeLabs\\Veneer\\Plugin\\Wrapper as PluginWrapper';
+            $uses['DecodeLabs\\Veneer\\Plugin\\Wrapper'] = 'PluginWrapper';
         }
 
-        foreach ($uses as $use) {
-            $class .= 'use ' . $use . ';' . "\n";
+        if ($listMethods) {
+            $methodDef = $this->listClassMethods($ref, $uses);
+        }
+
+        foreach ($uses as $target => $alias) {
+            $class .= 'use ' . $target;
+
+            if ($alias !== null) {
+                $class .= ' as ' . $alias;
+            }
+
+            $class .= ';' . "\n";
         }
 
 
         // Class structure
-        $class .= "\n";
-
-        if ($listMethods) {
-            $class .= $this->listClassMethods($ref);
-        }
-
-        $class .=
+        $class .= "\n" .
             'class ' . $className . ' implements Proxy' . "\n" .
             '{' . "\n" .
             '    use ProxyTrait;' . "\n\n";
@@ -293,6 +301,13 @@ class Binding
             $class .= '    ' . implode("\n    ", $properties) . "\n";
         }
 
+
+        // Methods
+        if ($listMethods) {
+            $class .= "\n" . $methodDef;
+        }
+
+        // End
         $class .= '};' . "\n";
 
 
@@ -312,27 +327,25 @@ class Binding
      *
      * @template T of object
      * @phpstan-param ReflectionClass<T> $ref
+     * @param array<string, string> $uses
      */
-    private function listClassMethods(ReflectionClass $ref): string
-    {
+    private function listClassMethods(
+        ReflectionClass $ref,
+        array &$uses
+    ): string {
         $methods = [];
 
         foreach ($ref->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $string = ' * @method static ';
+            $string = 'public static function ';
             $name = $method->getName();
-
-            if ($method->hasReturnType()) {
-                $string .= $method->getReturnType() . ' ';
-            }
-
             $string .= $name . '(';
             $params = [];
 
             foreach ($method->getParameters() as $parameter) {
                 $param = '';
 
-                if ($parameter->hasType()) {
-                    $param .= $parameter->getType() . ' ';
+                if (null !== ($type = $parameter->getType())) {
+                    $param .= $this->exportType($type, $uses) . ' ';
                 }
 
                 if ($parameter->isVariadic()) {
@@ -349,6 +362,13 @@ class Binding
             }
 
             $string .= implode(', ', $params) . ')';
+
+            if (null !== ($type = $method->getReturnType())) {
+                $string .= ': ' . $this->exportType($type, $uses) . ' ';
+            }
+
+            $string .= '{}';
+
             $methods[$name] = $string;
         }
 
@@ -356,12 +376,100 @@ class Binding
             return '';
         }
 
-        return
-            '/**' . "\n" .
-            implode("\n", $methods) . "\n" .
-            ' */' . "\n";
+        return '    ' . implode("\n    ", $methods) . "\n";
     }
 
+    /**
+     * Export type reflection
+     *
+     * @param array<string, string> $uses
+     */
+    private function exportType(
+        ReflectionType $type,
+        array &$uses
+    ): string {
+        if ($type instanceof ReflectionNamedType) {
+            return $this->exportNamedType($type, $uses);
+        } elseif ($type instanceof ReflectionUnionType) {
+            return $this->exportUnionType($type, $uses);
+        } elseif ($type instanceof ReflectionIntersectionType) {
+            return $this->exportIntersectionType($type, $uses);
+        }
+
+        throw Exceptional::Runtime('Unknown type reflection', null, $type);
+    }
+
+    /**
+     * Export named type reflection
+     *
+     * @param array<string, string> $uses
+     */
+    private function exportNamedType(
+        ReflectionNamedType $type,
+        array &$uses
+    ): string {
+        $name = $type->getName();
+
+        if ($type->isBuiltin()) {
+            $output = $name;
+        } else {
+            static $ref = 0;
+
+            if (!array_key_exists($name, $uses)) {
+                $uses[$name] = 'Ref' . $ref++;
+            }
+
+            $output = $uses[$name];
+
+            /** @phpstan-ignore-next-line */
+            if ($output === null) {
+                $parts = explode('\\', $name);
+                $output = array_pop($parts);
+            }
+        }
+
+        if ($type->allowsNull()) {
+            $output = '?' . $output;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Export union type reflection
+     *
+     * @param array<string, string> $uses
+     */
+    private function exportUnionType(
+        ReflectionUnionType $type,
+        array &$uses
+    ): string {
+        $output = [];
+
+        foreach ($type->getTypes() as $inner) {
+            $output[] = $this->exportType($inner, $uses);
+        }
+
+        return implode('|', $output);
+    }
+
+    /**
+     * Export intersection type reflection
+     *
+     * @param array<string, string> $uses
+     */
+    private function exportIntersectionType(
+        ReflectionIntersectionType $type,
+        array &$uses
+    ): string {
+        $output = [];
+
+        foreach ($type->getTypes() as $inner) {
+            $output[] = $this->exportType($inner, $uses);
+        }
+
+        return implode('&', $output);
+    }
 
 
     /**
