@@ -284,11 +284,15 @@ class Binding
             $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
         }
 
-        $class .= '    ' . implode("\n    ", $consts) . "\n\n";
+        $class .= '    ' . implode("\n    ", $consts) . "\n";
 
 
         // Properties
-        $class .= '    ' . implode("\n    ", $properties) . "\n";
+        if (!empty($properties)) {
+            $class .= "\n";
+            $class .= '    ' . implode("\n    ", $properties) . "\n";
+        }
+
         $class .= '};' . "\n";
 
 

@@ -48,7 +48,10 @@ class Generator
                 continue;
             }
 
-            if (0 !== strpos($file, (string)$this->scanDir)) {
+            if (
+                0 !== strpos($file, (string)$this->scanDir) ||
+                0 === strpos($file, (string)$this->scanDir . '/vendor')
+            ) {
                 continue;
             }
 

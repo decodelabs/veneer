@@ -54,7 +54,7 @@
         "check": [
             "@composer update",
             "@analyze",
-            "@ecs",
+            "@ecs-fix",
             "@lint",
             "@eclint",
             "@non-ascii"
