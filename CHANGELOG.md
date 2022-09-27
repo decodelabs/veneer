@@ -1,3 +1,6 @@
+## v0.10.4 (2022-09-27)
+* Improved stub generation
+
 ## v0.10.3 (2022-09-27)
 * Export full method defs in Stubs
 
