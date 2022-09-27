@@ -248,11 +248,12 @@ class Binding
 
         foreach ($plugins as $name => $plugin) {
             $uses[$plugin->getType()] = ucfirst($name) . 'Plugin';
-            $type = ucfirst($name) . 'Plugin';
+            $pluginType = $type = ucfirst($name) . 'Plugin';
 
             if ($plugin->isLazy()) {
                 $wrapper = true;
                 $type .= '|PluginWrapper';
+                $properties[$name . '-comment'] = '/** @var ' . $type . '<' . $pluginType . '> $' . $name . ' */';
             }
 
             $properties[$name] = 'public static ' . $type . ' $' . $name . ';';
