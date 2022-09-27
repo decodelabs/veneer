@@ -445,6 +445,12 @@ class Binding
 
         if ($type->isBuiltin()) {
             $output = $name;
+        } elseif (
+            $name === 'static' ||
+            $name === 'self' ||
+            $name === 'parent'
+        ) {
+            return 'Inst';
         } else {
             static $ref = 0;
 

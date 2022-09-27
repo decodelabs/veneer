@@ -1,3 +1,6 @@
+## v0.10.7 (2022-09-27)
+* Fixed static type ref handling
+
 ## v0.10.6 (2022-09-27)
 * Fixed nullable type export
 * Updated composer check script
