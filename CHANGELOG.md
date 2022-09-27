@@ -1,3 +1,6 @@
+## v0.10.5 (2022-09-27)
+* Fixed plugin wrapper type inference
+
 ## v0.10.4 (2022-09-27)
 * Improved stub generation
 
