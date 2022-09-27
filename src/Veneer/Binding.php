@@ -18,6 +18,7 @@ use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
 use ReflectionClass;
+use ReflectionMethod;
 use ReflectionObject;
 
 class Binding
@@ -202,12 +203,13 @@ class Binding
      */
     public function generateBindingClass(
         ?string $namespace,
-        string $instanceClass
+        string $instanceClass,
+        bool $listMethods = false
     ): string {
-        $plugins = $consts = [];
         $ref = new ReflectionClass($instanceClass);
         $instName = $ref->getName();
 
+        // Normalize namespace
         $parts = explode('\\', $this->proxyClass);
         $className = array_pop($parts);
 
@@ -223,13 +225,54 @@ class Binding
             $namespace = null;
         }
 
-        $class =
-            'use DecodeLabs\\Veneer\\Proxy;' . "\n" .
-            'use DecodeLabs\\Veneer\\ProxyTrait;' . "\n" .
-            'use ' . $instName . ' as Inst;' . "\n" .
-            'class ' . $className . ' implements Proxy { use ProxyTrait;' . "\n";
+
+        // Initialization
+        $plugins = $this->getPlugins();
+        $properties = $consts = $uses = [];
+        $class = '';
 
 
+        // Uses
+        $uses[] = 'DecodeLabs\\Veneer\\Proxy';
+        $uses[] = 'DecodeLabs\\Veneer\\ProxyTrait';
+        $uses[] = $instName . ' as Inst';
+        $wrapper = false;
+
+        foreach ($plugins as $name => $plugin) {
+            $uses[] = $plugin->getType() . ' as ' . ucfirst($name) . 'Plugin';
+            $type = ucfirst($name) . 'Plugin';
+
+            if ($plugin->isLazy()) {
+                $wrapper = true;
+                $type .= '|PluginWrapper';
+            }
+
+            $properties[$name] = 'public static ' . $type . ' $' . $name . ';';
+        }
+
+        if ($wrapper) {
+            $uses[] = 'DecodeLabs\\Veneer\\Plugin\\Wrapper as PluginWrapper';
+        }
+
+        foreach ($uses as $use) {
+            $class .= 'use ' . $use . ';' . "\n";
+        }
+
+
+        // Class structure
+        $class .= "\n";
+
+        if ($listMethods) {
+            $class .= $this->listClassMethods($ref);
+        }
+
+        $class .=
+            'class ' . $className . ' implements Proxy' . "\n" .
+            '{' . "\n" .
+            '    use ProxyTrait;' . "\n\n";
+
+
+        // Constants
         $consts['VENEER'] = 'const VENEER = \'' . $this->proxyClass . '\';';
         $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
 
@@ -241,25 +284,79 @@ class Binding
             $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
         }
 
-        $class .= implode("\n", $consts);
+        $class .= '    ' . implode("\n    ", $consts) . "\n\n";
 
-        foreach ($this->getPluginNames() as $name) {
-            $plugins[$name] = 'public static $' . $name . ';';
-        }
 
-        $class .= implode("\n", $plugins);
+        // Properties
+        $class .= '    ' . implode("\n    ", $properties) . "\n";
         $class .= '};' . "\n";
 
 
+        // Namespace
         if ($namespace === null) {
             $class = 'namespace {' . "\n" . $class . "\n" . '}';
         } else {
-            $class = 'namespace ' . $namespace . ';' . "\n" . $class;
+            $class = 'namespace ' . $namespace . ';' . "\n\n" . $class;
         }
 
         return $class;
     }
 
+
+    /**
+     * List instance class methods
+     *
+     * @template T of object
+     * @phpstan-param ReflectionClass<T> $ref
+     */
+    private function listClassMethods(ReflectionClass $ref): string
+    {
+        $methods = [];
+
+        foreach ($ref->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $string = ' * @method static ';
+            $name = $method->getName();
+
+            if ($method->hasReturnType()) {
+                $string .= $method->getReturnType() . ' ';
+            }
+
+            $string .= $name . '(';
+            $params = [];
+
+            foreach ($method->getParameters() as $parameter) {
+                $param = '';
+
+                if ($parameter->hasType()) {
+                    $param .= $parameter->getType() . ' ';
+                }
+
+                if ($parameter->isVariadic()) {
+                    $param .= '...';
+                }
+
+                $param .= '$' . $parameter->getName();
+
+                if ($parameter->isDefaultValueAvailable()) {
+                    $param .= ' = ' . var_export($parameter->getDefaultValue(), true);
+                }
+
+                $params[] = $param;
+            }
+
+            $string .= implode(', ', $params) . ')';
+            $methods[$name] = $string;
+        }
+
+        if (empty($methods)) {
+            return '';
+        }
+
+        return
+            '/**' . "\n" .
+            implode("\n", $methods) . "\n" .
+            ' */' . "\n";
+    }
 
 
 

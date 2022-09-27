@@ -25,7 +25,6 @@ foreach ([
 use DecodeLabs\Atlas;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Terminus as Cli;
-use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Stub\Generator;
 
 // Check dependencies
@@ -41,45 +40,39 @@ if (is_file($genPath = __DIR__ . '/../src/Veneer/Stub/Generator.php')) {
     require_once $genPath;
 }
 
-// Get bindings
-$manager = Veneer::getDefaultManager();
-$bindings = $manager->getBindings();
 
 // Prepare arguments
 Cli::getCommandDefinition()
-    ->addArgument('?binding', 'Name of the binding');
+    ->addArgument('?stubPath', 'Directory to save the stub');
 Cli::prepareArguments();
 
-// Ask for binding name
-if (null === ($bindingName = Cli::getArgument('binding'))) {
-    Cli::newLine();
-    foreach ($bindings as $proxyClass => $binding) {
-        Cli::{'>.yellow'}($proxyClass);
-    }
-    Cli::newLine();
 
-    $bindingName = Cli::newQuestion('Which binding do you want to stub?')
-        ->prompt();
+// Ask for stub path
+if (null === ($stubPath = Cli::getArgument('binding'))) {
+    $stubPath = 'stubs/';
+    //$stubPath = Cli::ask('Where would you like to save it?', $stubPath);
 }
 
-$bindingName = ucfirst($bindingName);
+$scanDir = Atlas::dir(getcwd());
+$stubDir = Atlas::dir($stubPath);
 
-// Load binding
-if (!isset($bindings[$bindingName])) {
-    Cli::operative('Binding not found');
+// Scan
+$generator = new Generator($scanDir, $stubDir);
+$bindings = $generator->scan();
+
+if (empty($bindings)) {
+    Cli::warning('There are no Veneer bindings to stub');
     exit;
 }
 
-$binding = $bindings[$bindingName];
+Cli::newLine();
 
-// Ask for stub path
-$stubPath = 'stubs/';
-$stubPath = Cli::ask('Where would you like to save it?', $stubPath);
+foreach ($bindings as $binding) {
+    Cli::{'brightMagenta'}($binding->getProviderClass().' ');
+    $generator->generate($binding);
+    Cli::success('done');
+}
 
-// Generate
-$dir = Atlas::createDir($stubPath);
-$generator = new Generator($dir);
-$generator->generate($binding);
+Cli::newLine();
 
-Cli::success('done');
 exit;
