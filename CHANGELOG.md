@@ -1,3 +1,6 @@
+## v0.10.3 (2022-09-27)
+* Export full method defs in Stubs
+
 ## v0.10.2 (2022-09-27)
 * Fixed stub generator scanner
 
