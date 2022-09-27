@@ -1,3 +1,6 @@
+## v0.10.2 (2022-09-27)
+* Fixed stub generator scanner
+
 ## v0.10.1 (2022-09-27)
 * Improved stub generator
 
