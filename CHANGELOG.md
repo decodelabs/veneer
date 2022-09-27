@@ -1,3 +1,7 @@
+## v0.10.6 (2022-09-27)
+* Fixed nullable type export
+* Updated composer check script
+
 ## v0.10.5 (2022-09-27)
 * Fixed plugin wrapper type inference
 
