@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer;
 
+use DecodeLabs\Exceptional;
+use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
 class Manager
@@ -138,6 +140,44 @@ class Manager
         }
 
         return $binding->hasPlugin($pluginName);
+    }
+
+    /**
+     * Ensure instance has plugin
+     */
+    public function ensurePlugin(
+        object $instance,
+        string $name
+    ): void {
+        if (isset($instance->{$name})) {
+            return;
+        }
+
+        $class = get_class($instance);
+
+        foreach ($this->bindings as $binding) {
+            if ($binding->getProviderClass() !== $class) {
+                continue;
+            }
+
+            $names = $binding->getPluginNames();
+
+            if (!in_array($name, $names)) {
+                throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
+            }
+
+            $target = $binding->getTarget();
+            $plugin = $target::$$name;
+
+            if ($plugin instanceof PluginWrapper) {
+                $plugin = $plugin->getVeneerPlugin();
+            }
+
+            $instance->{$name} = $plugin;
+            return;
+        }
+
+        throw Exceptional::Runtime('Unable to load plugin ' . $name . ' on ' . get_class($instance));
     }
 
     /**

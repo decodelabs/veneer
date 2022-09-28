@@ -28,17 +28,19 @@ class Wrapper implements Dumpable
 
     /**
      * Init with loader
+     *
+     * @phpstan-param callable(): T $loader
      */
-    public function __construct(Closure $loader)
+    public function __construct(callable $loader)
     {
-        $this->loader = $loader;
+        $this->loader = Closure::fromCallable($loader);
     }
 
 
     public function __get(string $name): mixed
     {
         if ($this->plugin === null) {
-            $this->loadPlugin();
+            $this->getVeneerPlugin();
         }
 
         return $this->plugin->{$name};
@@ -53,17 +55,21 @@ class Wrapper implements Dumpable
         array $args
     ): mixed {
         if ($this->plugin === null) {
-            $this->loadPlugin();
+            $this->getVeneerPlugin();
         }
 
         return $this->plugin->{$name}(...$args);
     }
 
-
-    private function loadPlugin(): void
+    /**
+     * @phpstan-return T
+     */
+    public function getVeneerPlugin(): object
     {
         $loader = $this->loader;
         $this->plugin = $loader();
+
+        return $this->plugin;
     }
 
 
@@ -75,7 +81,7 @@ class Wrapper implements Dumpable
     public function glitchDump(): iterable
     {
         if ($this->plugin === null) {
-            $this->loadPlugin();
+            $this->getVeneerPlugin();
         }
 
         yield 'className' => '@PluginWrapper';

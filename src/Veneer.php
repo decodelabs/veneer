@@ -74,6 +74,19 @@ final class Veneer
     }
 
 
+    public static function ensurePlugin(
+        object $target,
+        string $name
+    ): void {
+        if (isset($target->{$name})) {
+            return;
+        }
+
+        $manager = self::getDefaultManager();
+        $manager->ensurePlugin($target, $name);
+    }
+
+
     /**
      * Should cache bindings in tmp
      */
