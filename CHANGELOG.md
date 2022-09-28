@@ -1,3 +1,6 @@
+## v0.10.8 (2022-09-28)
+* Added ensurePlugin() helper for lazy loaders
+
 ## v0.10.7 (2022-09-27)
 * Fixed static type ref handling
 
