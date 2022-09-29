@@ -1,3 +1,6 @@
+## v0.10.11 (2022-09-29)
+* Turned off strict mode in PuginWrapper
+
 ## v0.10.10 (2022-09-29)
 * Fixed stub generator
 
