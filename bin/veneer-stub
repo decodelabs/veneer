@@ -22,57 +22,43 @@ foreach ([
     }
 }
 
-use DecodeLabs\Atlas;
-use DecodeLabs\Exceptional;
-use DecodeLabs\Terminus as Cli;
 use DecodeLabs\Veneer\Stub\Generator;
-
-// Check dependencies
-if (!class_exists(Atlas::class)) {
-    throw Exceptional::Setup('Atlas is required for interactive stub generation');
-}
-if (!class_exists(Cli::class)) {
-    throw Exceptional::Setup('Terminus is required for interactive stub generation');
-}
 
 // Load source generator
 if (is_file($genPath = __DIR__ . '/../src/Veneer/Stub/Generator.php')) {
     require_once $genPath;
 }
 
-
-// Prepare arguments
-Cli::getCommandDefinition()
-    ->addArgument('?stubPath', 'Directory to save the stub');
-Cli::prepareArguments();
-
-
-// Ask for stub path
-if (null === ($stubPath = Cli::getArgument('stubPath'))) {
-    $stubPath = 'stubs/';
-    //$stubPath = Cli::ask('Where would you like to save it?', $stubPath);
-}
-
-$scanDir = Atlas::dir(getcwd());
-$stubDir = Atlas::dir($stubPath);
+$stubDir = $_SERVER['argv'][1] ?? 'stubs/';
+$scanDir = getcwd();
 
 // Scan
 $generator = new Generator($scanDir, $stubDir);
 $bindings = $generator->scan();
 
+function colorOut(int|string $color, string $message): void
+{
+    echo sprintf("\e[%sm%s\e[%sm", $color, $message, '39;22');
+}
+
 if (empty($bindings)) {
-    Cli::warning('There are no Veneer bindings to stub');
+    colorOut('91;1', 'There are no Veneer bindings to stub');
+    echo "\n";
     exit;
 }
 
-Cli::newLine();
+
+echo "\n";
 
 foreach ($bindings as $binding) {
-    Cli::{'brightMagenta'}($binding->getProviderClass().' ');
+    colorOut(95, $binding->getProviderClass().' ');
+
     $generator->generate($binding);
-    Cli::success('done');
+
+    colorOut('92;1', '✓ done');
+    echo "\n";
 }
 
-Cli::newLine();
+echo "\n";
 
 exit;

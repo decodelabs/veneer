@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer\Stub;
 
-use DecodeLabs\Atlas\Dir;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Binding;
@@ -18,15 +17,15 @@ use ReflectionClass;
 
 class Generator
 {
-    protected Dir $scanDir;
-    protected Dir $stubDir;
+    protected string $scanDir;
+    protected string $stubDir;
 
     /**
      * Init with stub directory location
      */
     public function __construct(
-        Dir $scanDir,
-        Dir $stubDir
+        string $scanDir,
+        string $stubDir
     ) {
         $this->scanDir = $scanDir;
         $this->stubDir = $stubDir;
@@ -50,8 +49,8 @@ class Generator
             }
 
             if (
-                0 !== strpos($file, (string)$this->scanDir) ||
-                0 === strpos($file, (string)$this->scanDir . '/vendor')
+                0 !== strpos($file, $this->scanDir) ||
+                0 === strpos($file, $this->scanDir . '/vendor')
             ) {
                 continue;
             }
@@ -91,7 +90,10 @@ PHP;
             true
         );
 
-        $this->stubDir->ensureExists();
-        $this->stubDir->createFile($fileName . '.php', $code);
+        if (!is_dir($this->stubDir)) {
+            mkdir($this->stubDir, 0777, true);
+        }
+
+        file_put_contents($fileName . '.php', $code);
     }
 }
