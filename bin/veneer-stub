@@ -48,7 +48,7 @@ Cli::prepareArguments();
 
 
 // Ask for stub path
-if (null === ($stubPath = Cli::getArgument('binding'))) {
+if (null === ($stubPath = Cli::getArgument('stubPath'))) {
     $stubPath = 'stubs/';
     //$stubPath = Cli::ask('Where would you like to save it?', $stubPath);
 }

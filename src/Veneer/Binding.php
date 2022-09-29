@@ -294,7 +294,7 @@ class Binding
                 continue;
             }
 
-            $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';' . "\n";
+            $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';';
         }
 
         $class .= '    ' . implode("\n    ", $consts) . "\n";
