@@ -1,4 +1,7 @@
-## v0.10.8 (2022-09-29)
+## v0.10.10 (2022-09-29)
+* Fixed stub generator
+
+## v0.10.9 (2022-09-29)
 * Auto-wrap plugins if type accepted
 * Removed Atlas and Terminus dependencies for stubs
 

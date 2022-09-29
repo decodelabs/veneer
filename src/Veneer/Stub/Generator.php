@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer\Stub;
 
+use DecodeLabs\Atlas\Dir;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Binding;
@@ -90,10 +91,13 @@ PHP;
             true
         );
 
-        if (!is_dir($this->stubDir)) {
-            mkdir($this->stubDir, 0777, true);
+        $filePath = $this->stubDir.'/'.$fileName . '.php';
+        $dirPath = dirname($filePath);
+
+        if (!is_dir($dirPath)) {
+            mkdir($dirPath, 0777, true);
         }
 
-        file_put_contents($fileName . '.php', $code);
+        file_put_contents($filePath, $code);
     }
 }
