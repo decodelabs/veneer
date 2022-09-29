@@ -619,7 +619,12 @@ class Binding
      */
     private function loadPlugins(): void
     {
+        if ($this->target === null) {
+            throw Exceptional::Setup('Target binding has not been created');
+        }
+
         foreach ($this->getPlugins() as $name => $plugin) {
+            // Define loader
             $loader = function () use ($name, $plugin) {
                 if ($this->target === null) {
                     throw Exceptional::Setup('Target binding has not been created');
@@ -630,9 +635,21 @@ class Binding
                 return $this->target::$$name = $plugin->load($instance);
             };
 
+
             if ($plugin->isLazy()) {
-                $this->target::$$name = new PluginWrapper($loader);
+                // Apply later
+                $this->target::$$name = $wrapper = new PluginWrapper($loader);
+
+                if ($plugin->acceptsWrapper()) {
+                    /** @var object|null $instance */
+                    $instance = $this->target::getVeneerProxyTargetInstance();
+
+                    if ($instance !== null) {
+                        $instance->{$name} = $wrapper;
+                    }
+                }
             } else {
+                // Apply now
                 $loader();
             }
         }
