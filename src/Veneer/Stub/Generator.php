@@ -39,6 +39,7 @@ class Generator
      */
     public function scan(): array
     {
+        $bindings = [];
         $manager = Veneer::getDefaultManager();
 
         foreach ($manager->getBindings() as $binding) {
