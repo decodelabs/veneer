@@ -12,9 +12,11 @@ namespace DecodeLabs\Veneer;
 use Attribute;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Veneer\Plugin\SelfLoader;
+use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionUnionType;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Plugin
@@ -27,7 +29,7 @@ class Plugin
     protected ?string $type = null;
 
     protected bool $lazy = true;
-
+    protected bool $acceptsWrapper = false;
     protected ?ReflectionProperty $property = null;
 
     /**
@@ -55,6 +57,21 @@ class Plugin
 
         $this->setName($name = $property->getName());
         $typeRef = $property->getType();
+
+        if ($typeRef instanceof ReflectionUnionType) {
+            $types = $typeRef->getTypes();
+            $typeRef = array_shift($types);
+            $wrapper = array_shift($types);
+
+            if (
+                !empty($types) ||
+                $wrapper->getName() !== PluginWrapper::class
+            ) {
+                throw Exceptional::Setup('Plugin ' . $name . ' has a complex type');
+            }
+
+            $this->acceptsWrapper = true;
+        }
 
         if (!$typeRef instanceof ReflectionNamedType) {
             throw Exceptional::Setup('Plugin ' . $name . ' is not a Named type');
@@ -130,6 +147,15 @@ class Plugin
 
 
     /**
+     * Can accept wrapper
+     */
+    public function acceptsWrapper(): bool
+    {
+        return $this->acceptsWrapper;
+    }
+
+
+    /**
      * Load instance
      */
     public function load(object $instance): object
@@ -143,7 +169,8 @@ class Plugin
         if (
             $this->property &&
             $this->property->isInitialized($instance) &&
-            null !== ($output = $this->property->getValue($instance))
+            null !== ($output = $this->property->getValue($instance)) &&
+            !$output instanceof PluginWrapper
         ) {
             /** @var object $output */
             return $output;

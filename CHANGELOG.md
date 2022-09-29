@@ -1,3 +1,7 @@
+## v0.10.8 (2022-09-29)
+* Auto-wrap plugins if type accepted
+* Removed Atlas and Terminus dependencies for stubs
+
 ## v0.10.8 (2022-09-28)
 * Added ensurePlugin() helper for lazy loaders
 
