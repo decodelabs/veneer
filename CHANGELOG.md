@@ -1,3 +1,5 @@
+* Fixed PHP8.1 testing
+
 ## v0.10.11 (2022-09-29)
 * Turned off strict mode in PuginWrapper
 
