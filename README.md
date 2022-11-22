@@ -7,7 +7,13 @@
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat)](https://github.com/phpstan/phpstan)
 [![License](https://img.shields.io/packagist/l/decodelabs/veneer?style=flat)](https://packagist.org/packages/decodelabs/veneer)
 
-Create automated static frontages for your PHP objects.
+### Create automated static frontages for your PHP objects.
+
+Use Veneer to provide easy access to your most commonly used functionality without sacrificing testability.
+
+_Get news and updates on the [DecodeLabs blog](https://blog.decodelabs.com)._
+
+---
 
 ## Install
 

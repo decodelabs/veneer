@@ -1,3 +1,7 @@
+* Fixed use alias mapping for multiple refs
+* Migrated to use effigy in CI workflow
+* Fixed PHP8.1 testing
+
 ## v0.10.11 (2022-09-29)
 * Turned off strict mode in PuginWrapper
 
