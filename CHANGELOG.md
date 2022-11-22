@@ -1,3 +1,6 @@
+## v0.10.14 (2022-11-22)
+* Properly fixed binding ref generation
+
 ## v0.10.13 (2022-11-22)
 * Fixed binding ref generation
 
