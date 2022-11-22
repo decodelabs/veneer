@@ -456,7 +456,9 @@ class Binding
             $test = array_flip($uses);
 
             if (!array_key_exists($name, $test)) {
-                $uses['Ref' . $ref++] = $name;
+                $key = 'Ref' . $ref++;
+                $uses[$key] = $name;
+                $test[$name] = $key;
             }
 
             $output = $test[$name];
