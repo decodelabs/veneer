@@ -453,13 +453,13 @@ class Binding
             return 'Inst';
         } else {
             static $ref = 0;
+            $test = array_flip($uses);
 
-            if (!in_array($name, $uses)) {
+            if (!array_key_exists($name, $test)) {
                 $uses['Ref' . $ref++] = $name;
             }
 
-            $refKey = 'Ref' . $ref;
-            $output = $uses[$refKey];
+            $output = $test[$name];
 
             /** @phpstan-ignore-next-line */
             if ($output === null) {

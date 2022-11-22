@@ -1,3 +1,7 @@
+## v0.10.13 (2022-11-22)
+* Fixed binding ref generation
+
+## v0.10.12 (2022-11-22)
 * Fixed use alias mapping for multiple refs
 * Migrated to use effigy in CI workflow
 * Fixed PHP8.1 testing
