@@ -237,9 +237,9 @@ class Binding
 
 
         // Uses
-        $uses['DecodeLabs\\Veneer\\Proxy'] = null;
-        $uses['DecodeLabs\\Veneer\\ProxyTrait'] = null;
-        $uses[$instName] = 'Inst';
+        $uses['Proxy'] = 'DecodeLabs\\Veneer\\Proxy';
+        $uses['ProxyTrait'] = 'DecodeLabs\\Veneer\\ProxyTrait';
+        $uses['Inst'] = $instName;
         $wrapper = false;
 
         if ($listMethods) {
@@ -247,7 +247,7 @@ class Binding
         }
 
         foreach ($plugins as $name => $plugin) {
-            $uses[$plugin->getType()] = ucfirst($name) . 'Plugin';
+            $uses[ucfirst($name) . 'Plugin'] = $plugin->getType();
             $pluginType = $type = ucfirst($name) . 'Plugin';
 
             if ($plugin->isLazy()) {
@@ -260,14 +260,14 @@ class Binding
         }
 
         if ($wrapper) {
-            $uses['DecodeLabs\\Veneer\\Plugin\\Wrapper'] = 'PluginWrapper';
+            $uses['PluginWrapper'] = 'DecodeLabs\\Veneer\\Plugin\\Wrapper';
         }
 
         if ($listMethods) {
             $methodDef = $this->listClassMethods($ref, $uses);
         }
 
-        foreach ($uses as $target => $alias) {
+        foreach ($uses as $alias => $target) {
             $class .= 'use ' . $target;
 
             if ($alias !== null) {
@@ -454,11 +454,12 @@ class Binding
         } else {
             static $ref = 0;
 
-            if (!array_key_exists($name, $uses)) {
-                $uses[$name] = 'Ref' . $ref++;
+            if (!in_array($name, $uses)) {
+                $uses['Ref' . $ref++] = $name;
             }
 
-            $output = $uses[$name];
+            $refKey = 'Ref' . $ref;
+            $output = $uses[$refKey];
 
             /** @phpstan-ignore-next-line */
             if ($output === null) {
