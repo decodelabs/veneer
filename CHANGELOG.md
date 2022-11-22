@@ -1,3 +1,4 @@
+* Fixed use alias mapping for multiple refs
 * Migrated to use effigy in CI workflow
 * Fixed PHP8.1 testing
 
