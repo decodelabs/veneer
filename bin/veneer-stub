@@ -9,20 +9,9 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer;
 
-$basePath = getcwd();
-
-foreach ([
-    $basePath . '/vendor/autoload.php',
-    __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../vendor/autoload.php'
-] as $file) {
-    if (file_exists($file)) {
-        require $file;
-        break;
-    }
-}
-
 use DecodeLabs\Veneer\Stub\Generator;
+
+require_once $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
 
 // Load source generator
 if (is_file($genPath = __DIR__ . '/../src/Veneer/Stub/Generator.php')) {

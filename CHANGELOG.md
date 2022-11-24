@@ -1,3 +1,5 @@
+* Simplified bin dir handling
+
 ## v0.10.14 (2022-11-22)
 * Properly fixed binding ref generation
 
