@@ -1,3 +1,6 @@
+## v0.10.16 (2022-11-28)
+* Ensure protected constructors are invocable in bindings
+
 ## v0.10.15 (2022-11-28)
 * Added replacePlugin helper
 * Simplified bin dir handling
