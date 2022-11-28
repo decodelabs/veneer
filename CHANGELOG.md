@@ -1,3 +1,5 @@
+## v0.10.15 (2022-11-28)
+* Added replacePlugin helper
 * Simplified bin dir handling
 
 ## v0.10.14 (2022-11-22)
