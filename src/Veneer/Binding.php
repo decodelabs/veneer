@@ -97,6 +97,7 @@ class Binding
         // Call constructor
         $ref = new ReflectionObject($instance);
         $method = $ref->getMethod('__construct');
+        $method->setAccessible(true);
         $method->invoke($instance);
 
         // Load plugins
