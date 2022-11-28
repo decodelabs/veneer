@@ -74,6 +74,9 @@ final class Veneer
     }
 
 
+    /**
+     * Ensure instance has plugin property
+     */
     public static function ensurePlugin(
         object $target,
         string $name
@@ -84,6 +87,19 @@ final class Veneer
 
         $manager = self::getDefaultManager();
         $manager->ensurePlugin($target, $name);
+    }
+
+
+    /**
+     * Replace instance of plugin property
+     */
+    public static function replacePlugin(
+        object $target,
+        string $name,
+        mixed $plugin
+    ): void {
+        $manager = self::getDefaultManager();
+        $manager->replacePlugin($target, $name, $plugin);
     }
 
 

@@ -17,6 +17,7 @@
         "psr/container": "^2"
     },
     "require-dev": {
+        "composer-runtime-api": "^2.2",
         "decodelabs/phpstan-decodelabs": "^0.6"
     },
     "autoload": {

@@ -153,6 +153,48 @@ class Manager
             return;
         }
 
+        $binding = $this->getBindingForInstance($instance);
+        $names = $binding->getPluginNames();
+
+        if (!in_array($name, $names)) {
+            throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
+        }
+
+        $target = $binding->getTarget();
+        $plugin = $target::$$name;
+
+        if ($plugin instanceof PluginWrapper) {
+            $plugin = $plugin->getVeneerPlugin();
+        }
+
+        $instance->{$name} = $plugin;
+    }
+
+    /**
+     * Replace instance of plugin
+     */
+    public function replacePlugin(
+        object $instance,
+        string $name,
+        mixed $plugin
+    ): void {
+        $binding = $this->getBindingForInstance($instance);
+        $names = $binding->getPluginNames();
+
+        if (!in_array($name, $names)) {
+            throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
+        }
+
+        $instance->{$name} = $plugin;
+        $target = $binding->getTarget();
+        $target::$$name = $plugin;
+    }
+
+    /**
+     * Find binding for class of instance
+     */
+    protected function getBindingForInstance(object $instance): Binding
+    {
         $class = get_class($instance);
 
         foreach ($this->bindings as $binding) {
@@ -160,24 +202,10 @@ class Manager
                 continue;
             }
 
-            $names = $binding->getPluginNames();
-
-            if (!in_array($name, $names)) {
-                throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
-            }
-
-            $target = $binding->getTarget();
-            $plugin = $target::$$name;
-
-            if ($plugin instanceof PluginWrapper) {
-                $plugin = $plugin->getVeneerPlugin();
-            }
-
-            $instance->{$name} = $plugin;
-            return;
+            return $binding;
         }
 
-        throw Exceptional::Runtime('Unable to load plugin ' . $name . ' on ' . get_class($instance));
+        throw Exceptional::Runtime('Unable to find binding for ' . get_class($instance));
     }
 
     /**
