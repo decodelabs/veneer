@@ -1,3 +1,4 @@
+## v0.10.17 (2023-01-27)
 * Added slashes to stub class name strings
 
 ## v0.10.16 (2022-11-28)
