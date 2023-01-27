@@ -287,7 +287,7 @@ class Binding
 
 
         // Constants
-        $consts['VENEER'] = 'const VENEER = \'' . $this->proxyClass . '\';';
+        $consts['VENEER'] = 'const VENEER = \'' . addslashes($this->proxyClass) . '\';';
         $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
 
         foreach (array_keys($ref->getConstants()) as $key) {
