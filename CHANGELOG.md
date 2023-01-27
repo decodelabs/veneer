@@ -1,3 +1,5 @@
+* Added slashes to stub class name strings
+
 ## v0.10.16 (2022-11-28)
 * Ensure protected constructors are invocable in bindings
 
