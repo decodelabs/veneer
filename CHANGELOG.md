@@ -1,3 +1,5 @@
+* Converted phpstan doc comments to generic
+
 ## v0.10.17 (2023-01-27)
 * Added slashes to stub class name strings
 

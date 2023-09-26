@@ -29,7 +29,7 @@ class Wrapper implements Dumpable
     /**
      * Init with loader
      *
-     * @phpstan-param callable(): T $loader
+     * @param callable(): T $loader
      */
     public function __construct(callable $loader)
     {
@@ -62,7 +62,7 @@ class Wrapper implements Dumpable
     }
 
     /**
-     * @phpstan-return T
+     * @return T
      */
     public function getVeneerPlugin(): object
     {

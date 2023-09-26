@@ -75,8 +75,8 @@ class Manager
     /**
      * Add alias that can be used from root namespace
      *
-     * @phpstan-param class-string $providerClass
-     * @phpstan-param class-string $proxyClass
+     * @param class-string $providerClass
+     * @param class-string $proxyClass
      */
     public function bind(
         string $providerClass,

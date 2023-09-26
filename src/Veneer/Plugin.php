@@ -24,7 +24,7 @@ class Plugin
     protected ?string $name = null;
 
     /**
-     * @phpstan-var class-string|null $type
+     * @var class-string|null $type
      */
     protected ?string $type = null;
 
@@ -33,7 +33,7 @@ class Plugin
     protected ?ReflectionProperty $property = null;
 
     /**
-     * @phpstan-var class-string<SelfLoader>|null $loaderClass
+     * @var class-string<SelfLoader>|null $loaderClass
      */
     protected ?string $loaderClass = null;
 
@@ -41,7 +41,7 @@ class Plugin
     /**
      * Init with SelfLoader class
      *
-     * @phpstan-param class-string<SelfLoader>|null $loaderClass
+     * @param class-string<SelfLoader>|null $loaderClass
      */
     public function __construct(?string $loaderClass = null)
     {
@@ -77,7 +77,7 @@ class Plugin
             throw Exceptional::Setup('Plugin ' . $name . ' is not a Named type');
         }
 
-        /** @phpstan-var class-string $type */
+        /** @var class-string $type */
         $type = $typeRef->getName();
         $this->setType($type);
 
@@ -112,7 +112,7 @@ class Plugin
     /**
      * Set type
      *
-     * @phpstan-param class-string $type
+     * @param class-string $type
      */
     public function setType(string $type): void
     {
@@ -122,7 +122,7 @@ class Plugin
     /**
      * Get type
      *
-     * @phpstan-return class-string|null
+     * @return class-string|null
      */
     public function getType(): ?string
     {

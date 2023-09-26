@@ -42,8 +42,8 @@ final class Veneer
     /**
      * Register provider
      *
-     * @phpstan-param class-string $providerClass
-     * @phpstan-param class-string $proxyClass
+     * @param class-string $providerClass
+     * @param class-string $proxyClass
      */
     public static function register(
         string $providerClass,
