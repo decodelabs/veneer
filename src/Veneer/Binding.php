@@ -28,12 +28,12 @@ use ReflectionUnionType;
 class Binding
 {
     /**
-     * @phpstan-var class-string
+     * @var class-string
      */
     protected string $providerClass;
 
     /**
-     * @phpstan-var class-string
+     * @var class-string
      */
     protected string $proxyClass;
 
@@ -49,8 +49,8 @@ class Binding
     /**
      * Init with criteria
      *
-     * @phpstan-param class-string $providerClass
-     * @phpstan-param class-string $proxyClass
+     * @param class-string $providerClass
+     * @param class-string $proxyClass
      */
     public function __construct(
         string $providerClass,
@@ -170,7 +170,7 @@ class Binding
     /**
      * Create binding class
      *
-     * @phpstan-param class-string $instanceClass
+     * @param class-string $instanceClass
      */
     private function createBindingClass(string $instanceClass): Proxy
     {
@@ -204,7 +204,7 @@ class Binding
     /**
      * Generate binding class definition
      *
-     * @phpstan-param class-string $instanceClass
+     * @param class-string $instanceClass
      */
     public function generateBindingClass(
         ?string $namespace,
@@ -332,7 +332,7 @@ class Binding
      * List instance class methods
      *
      * @template T of object
-     * @phpstan-param ReflectionClass<T> $ref
+     * @param ReflectionClass<T> $ref
      * @param array<string, string> $uses
      */
     private function listClassMethods(
