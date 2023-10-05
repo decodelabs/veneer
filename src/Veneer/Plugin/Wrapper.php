@@ -9,14 +9,23 @@
 
 namespace DecodeLabs\Veneer\Plugin;
 
+use ArrayAccess;
 use Closure;
+use DecodeLabs\Exceptional;
 use DecodeLabs\Glitch\Dumpable;
+use IteratorAggregate;
+use Traversable;
 
 /**
  * @template T of object
  * @mixin T
+ * @implements ArrayAccess<mixed, mixed>
+ * @implements IteratorAggregate<mixed, mixed>
  */
-class Wrapper implements Dumpable
+class Wrapper implements
+    ArrayAccess,
+    IteratorAggregate,
+    Dumpable
 {
     protected Closure $loader;
 
@@ -68,6 +77,104 @@ class Wrapper implements Dumpable
     {
         $loader = $this->loader;
         $this->plugin = $loader();
+
+        return $this->plugin;
+    }
+
+
+    /**
+     * Set offset
+     */
+    public function offsetSet(
+        mixed $offset,
+        mixed $value
+    ): void {
+        if ($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if (!$this->plugin instanceof ArrayAccess) {
+            throw Exceptional::Runtime(
+                'Plugin does not implement ArrayAccess'
+            );
+        }
+
+        $this->plugin->offsetSet($offset, $value);
+    }
+
+    /**
+     * Get offset
+     */
+    public function offsetGet(mixed $offset): mixed
+    {
+        if ($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if (!$this->plugin instanceof ArrayAccess) {
+            throw Exceptional::Runtime(
+                'Plugin does not implement ArrayAccess'
+            );
+        }
+
+        return $this->plugin->offsetGet($offset);
+    }
+
+    /**
+     * Check if offset exists
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        if ($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if (!$this->plugin instanceof ArrayAccess) {
+            throw Exceptional::Runtime(
+                'Plugin does not implement ArrayAccess'
+            );
+        }
+
+        return $this->plugin->offsetExists($offset);
+    }
+
+    /**
+     * Unset offset
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        if ($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if (!$this->plugin instanceof ArrayAccess) {
+            throw Exceptional::Runtime(
+                'Plugin does not implement ArrayAccess'
+            );
+        }
+
+        $this->plugin->offsetUnset($offset);
+    }
+
+
+    /**
+     * Get iterator
+     */
+    public function getIterator(): Traversable
+    {
+        if ($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if ($this->plugin instanceof IteratorAggregate) {
+            return $this->plugin->getIterator();
+        }
+
+        if (!$this->plugin instanceof Traversable) {
+            throw Exceptional::Runtime(
+                'Plugin does not implement Traversable'
+            );
+        }
 
         return $this->plugin;
     }

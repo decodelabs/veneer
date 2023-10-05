@@ -1,3 +1,7 @@
+## v0.10.19 (2023-10-05)
+* Added ArrayAccess support to Plugin Wrapper
+* Added IteratorAggregate support to Plugin Wrapper
+
 ## v0.10.18 (2023-09-26)
 * Converted phpstan doc comments to generic
 
