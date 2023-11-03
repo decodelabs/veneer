@@ -43,16 +43,18 @@ class Plugin
      *
      * @param class-string<SelfLoader>|null $loaderClass
      */
-    public function __construct(?string $loaderClass = null)
-    {
+    public function __construct(
+        ?string $loaderClass = null
+    ) {
         $this->loaderClass = $loaderClass;
     }
 
     /**
      * Set property
      */
-    public function setProperty(ReflectionProperty $property): void
-    {
+    public function setProperty(
+        ReflectionProperty $property
+    ): void {
         $this->property = $property;
 
         $this->setName($name = $property->getName());
@@ -96,8 +98,9 @@ class Plugin
     /**
      * Set name
      */
-    public function setName(string $name): void
-    {
+    public function setName(
+        string $name
+    ): void {
         $this->name = $name;
     }
 
@@ -114,8 +117,9 @@ class Plugin
      *
      * @param class-string $type
      */
-    public function setType(string $type): void
-    {
+    public function setType(
+        string $type
+    ): void {
         $this->type = $type;
     }
 
@@ -132,8 +136,9 @@ class Plugin
     /**
      * Set lazy
      */
-    public function setLazy(bool $lazy): void
-    {
+    public function setLazy(
+        bool $lazy
+    ): void {
         $this->lazy = $lazy;
     }
 
@@ -158,8 +163,9 @@ class Plugin
     /**
      * Load instance
      */
-    public function load(object $instance): object
-    {
+    public function load(
+        object $instance
+    ): object {
         // Check name
         if ($this->name === null) {
             throw Exceptional::Setup('Plugin name has not been defined');

@@ -110,8 +110,9 @@ class Binding
      *
      * @return $this
      */
-    public function bindInstance(?ContainerInterface $container): Binding
-    {
+    public function bindInstance(
+        ?ContainerInterface $container
+    ): Binding {
         $instance = null;
         $this->deferred = false;
 
@@ -172,8 +173,9 @@ class Binding
      *
      * @param class-string $instanceClass
      */
-    private function createBindingClass(string $instanceClass): Proxy
-    {
+    private function createBindingClass(
+        string $instanceClass
+    ): Proxy {
         $class = $this->generateBindingClass(
             'DecodeLabs\\Veneer\\Binding',
             $instanceClass
@@ -585,8 +587,9 @@ class Binding
     /**
      * Has plugin by name
      */
-    public function hasPlugin(string $name): bool
-    {
+    public function hasPlugin(
+        string $name
+    ): bool {
         return in_array($name, $this->getPluginNames());
     }
 
@@ -595,8 +598,9 @@ class Binding
     /**
      * Find list of plugin names
      */
-    private function scanPlugins(object $instance): void
-    {
+    private function scanPlugins(
+        object $instance
+    ): void {
         $this->plugins = [];
 
         $ref = new ReflectionClass($this->providerClass);

@@ -11,5 +11,7 @@ namespace DecodeLabs\Veneer\Plugin;
 
 interface SelfLoader
 {
-    public static function loadAsVeneerPlugin(object $instance): static;
+    public static function loadAsVeneerPlugin(
+        object $instance
+    ): static;
 }

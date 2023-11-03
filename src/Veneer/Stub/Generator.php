@@ -64,8 +64,9 @@ class Generator
     /**
      * Generate stub
      */
-    public function generate(Binding $binding): void
-    {
+    public function generate(
+        Binding $binding
+    ): void {
         $code = <<<PHP
 <?php
 /**

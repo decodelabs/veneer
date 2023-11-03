@@ -20,8 +20,9 @@ final class Veneer
     /**
      * Set default manager
      */
-    public static function setDefaultManager(Manager $manager): void
-    {
+    public static function setDefaultManager(
+        Manager $manager
+    ): void {
         self::$defaultManager = $manager;
     }
 
@@ -60,8 +61,9 @@ final class Veneer
     /**
      * Set PSR11 container
      */
-    public static function setContainer(?ContainerInterface $container): void
-    {
+    public static function setContainer(
+        ?ContainerInterface $container
+    ): void {
         self::getDefaultManager()->setContainer($container);
     }
 

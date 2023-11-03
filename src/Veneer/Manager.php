@@ -26,8 +26,9 @@ class Manager
     /**
      * Init with container and loader
      */
-    public function __construct(?ContainerInterface $container = null)
-    {
+    public function __construct(
+        ?ContainerInterface $container = null
+    ) {
         $this->setContainer($container);
         spl_autoload_register([$this, 'handleAutoload']);
     }
@@ -36,8 +37,9 @@ class Manager
     /**
      * Set PSR11 container
      */
-    public function setContainer(?ContainerInterface $container): void
-    {
+    public function setContainer(
+        ?ContainerInterface $container
+    ): void {
         $this->container = $container;
     }
 
@@ -53,8 +55,9 @@ class Manager
     /**
      * Handle autoload
      */
-    public function handleAutoload(string $class): void
-    {
+    public function handleAutoload(
+        string $class
+    ): void {
         if (!isset($this->bindings[$class])) {
             return;
         }
@@ -66,8 +69,9 @@ class Manager
     /**
      * Set deferral resolution on or off
      */
-    public function setDeferrals(bool $flag): void
-    {
+    public function setDeferrals(
+        bool $flag
+    ): void {
         $this->deferrals = $flag;
     }
 
@@ -99,8 +103,9 @@ class Manager
     /**
      * Bind proxy
      */
-    protected function bindProxy(Binding $binding): void
-    {
+    protected function bindProxy(
+        Binding $binding
+    ): void {
         if (!$binding->hasInstance()) {
             $binding->bindInstance($this->container);
         }
@@ -119,8 +124,9 @@ class Manager
     /**
      * Has class been bound?
      */
-    public function has(string $proxyClass): bool
-    {
+    public function has(
+        string $proxyClass
+    ): bool {
         return isset($this->bindings[$proxyClass]);
     }
 
@@ -193,8 +199,9 @@ class Manager
     /**
      * Find binding for class of instance
      */
-    protected function getBindingForInstance(object $instance): Binding
-    {
+    protected function getBindingForInstance(
+        object $instance
+    ): Binding {
         $class = get_class($instance);
 
         foreach ($this->bindings as $binding) {
@@ -231,8 +238,9 @@ class Manager
     /**
      * Get single binding
      */
-    public function getBinding(string $name): ?Binding
-    {
+    public function getBinding(
+        string $name
+    ): ?Binding {
         if (!isset($this->bindings[$name])) {
             return null;
         }

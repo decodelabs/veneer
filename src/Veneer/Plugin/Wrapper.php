@@ -40,14 +40,16 @@ class Wrapper implements
      *
      * @param callable(): T $loader
      */
-    public function __construct(callable $loader)
-    {
+    public function __construct(
+        callable $loader
+    ) {
         $this->loader = Closure::fromCallable($loader);
     }
 
 
-    public function __get(string $name): mixed
-    {
+    public function __get(
+        string $name
+    ): mixed {
         if ($this->plugin === null) {
             $this->getVeneerPlugin();
         }
@@ -105,8 +107,9 @@ class Wrapper implements
     /**
      * Get offset
      */
-    public function offsetGet(mixed $offset): mixed
-    {
+    public function offsetGet(
+        mixed $offset
+    ): mixed {
         if ($this->plugin === null) {
             $this->getVeneerPlugin();
         }
@@ -123,8 +126,9 @@ class Wrapper implements
     /**
      * Check if offset exists
      */
-    public function offsetExists(mixed $offset): bool
-    {
+    public function offsetExists(
+        mixed $offset
+    ): bool {
         if ($this->plugin === null) {
             $this->getVeneerPlugin();
         }
@@ -141,8 +145,9 @@ class Wrapper implements
     /**
      * Unset offset
      */
-    public function offsetUnset(mixed $offset): void
-    {
+    public function offsetUnset(
+        mixed $offset
+    ): void {
         if ($this->plugin === null) {
             $this->getVeneerPlugin();
         }
