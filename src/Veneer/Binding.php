@@ -10,8 +10,7 @@
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
-
-
+use DecodeLabs\Pandora\Container as PandoraContainer;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 
@@ -82,8 +81,9 @@ class Binding
     /**
      * Resolve deferral
      */
-    public function resolveDeferral(): void
-    {
+    public function resolveDeferral(
+        ?ContainerInterface $container = null
+    ): void {
         if (
             !$this->deferred ||
             !$this->target ||
@@ -98,7 +98,32 @@ class Binding
         $ref = new ReflectionObject($instance);
         $method = $ref->getMethod('__construct');
         $method->setAccessible(true);
-        $method->invoke($instance);
+        $args = [];
+
+        foreach ($method->getParameters() as $param) {
+            $type = $param->getType();
+
+            if (
+                $type !== null &&
+                $type->allowsNull()
+            ) {
+                $args[] = null;
+                continue;
+            }
+
+            if (
+                !$type instanceof ReflectionNamedType ||
+                !$container
+            ) {
+                throw Exceptional::Definition(
+                    'Unable to resolve constructor parameter ' . $param->getName() . ' for ' . $this->providerClass
+                );
+            }
+
+            $args[] = $container->get($type->getName());
+        }
+
+        $method->invoke($instance, ...$args);
 
         // Load plugins
         $this->loadPlugins();
@@ -110,8 +135,9 @@ class Binding
      *
      * @return $this
      */
-    public function bindInstance(?ContainerInterface $container): Binding
-    {
+    public function bindInstance(
+        ?ContainerInterface $container
+    ): Binding {
         $instance = null;
         $this->deferred = false;
 
@@ -152,6 +178,13 @@ class Binding
 
         if (!$this->deferred) {
             $this->loadPlugins();
+
+            if (
+                $container instanceof PandoraContainer &&
+                !$container->has($this->providerClass)
+            ) {
+                $container->bindShared($this->providerClass, $instance);
+            }
         }
 
         return $this;
@@ -172,8 +205,9 @@ class Binding
      *
      * @param class-string $instanceClass
      */
-    private function createBindingClass(string $instanceClass): Proxy
-    {
+    private function createBindingClass(
+        string $instanceClass
+    ): Proxy {
         $class = $this->generateBindingClass(
             'DecodeLabs\\Veneer\\Binding',
             $instanceClass
@@ -585,8 +619,9 @@ class Binding
     /**
      * Has plugin by name
      */
-    public function hasPlugin(string $name): bool
-    {
+    public function hasPlugin(
+        string $name
+    ): bool {
         return in_array($name, $this->getPluginNames());
     }
 
@@ -595,8 +630,9 @@ class Binding
     /**
      * Find list of plugin names
      */
-    private function scanPlugins(object $instance): void
-    {
+    private function scanPlugins(
+        object $instance
+    ): void {
         $this->plugins = [];
 
         $ref = new ReflectionClass($this->providerClass);

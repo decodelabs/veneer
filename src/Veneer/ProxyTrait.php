@@ -18,8 +18,9 @@ trait ProxyTrait
     /**
      * Set Veneer Proxy target instance
      */
-    public static function setVeneerProxyTargetInstance(object $instance): void
-    {
+    public static function setVeneerProxyTargetInstance(
+        object $instance
+    ): void {
         self::$instance = $instance;
     }
 

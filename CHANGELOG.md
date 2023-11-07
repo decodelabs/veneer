@@ -1,3 +1,6 @@
+## v0.10.20 (2023-11-07)
+* Added Container resolution for deferred constructor arguments
+
 ## v0.10.19 (2023-10-05)
 * Added ArrayAccess support to Plugin Wrapper
 * Added IteratorAggregate support to Plugin Wrapper
