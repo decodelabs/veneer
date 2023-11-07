@@ -117,7 +117,7 @@ class Manager
             $binding->isDeferred() &&
             $this->deferrals
         ) {
-            $binding->resolveDeferral();
+            $binding->resolveDeferral($this->container);
         }
     }
 

@@ -10,8 +10,7 @@
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
-
-
+use DecodeLabs\Pandora\Container as PandoraContainer;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 
@@ -82,8 +81,9 @@ class Binding
     /**
      * Resolve deferral
      */
-    public function resolveDeferral(): void
-    {
+    public function resolveDeferral(
+        ?ContainerInterface $container = null
+    ): void {
         if (
             !$this->deferred ||
             !$this->target ||
@@ -98,7 +98,32 @@ class Binding
         $ref = new ReflectionObject($instance);
         $method = $ref->getMethod('__construct');
         $method->setAccessible(true);
-        $method->invoke($instance);
+        $args = [];
+
+        foreach ($method->getParameters() as $param) {
+            $type = $param->getType();
+
+            if (
+                $type !== null &&
+                $type->allowsNull()
+            ) {
+                $args[] = null;
+                continue;
+            }
+
+            if (
+                !$type instanceof ReflectionNamedType ||
+                !$container
+            ) {
+                throw Exceptional::Definition(
+                    'Unable to resolve constructor parameter ' . $param->getName() . ' for ' . $this->providerClass
+                );
+            }
+
+            $args[] = $container->get($type->getName());
+        }
+
+        $method->invoke($instance, ...$args);
 
         // Load plugins
         $this->loadPlugins();
@@ -153,6 +178,13 @@ class Binding
 
         if (!$this->deferred) {
             $this->loadPlugins();
+
+            if (
+                $container instanceof PandoraContainer &&
+                !$container->has($this->providerClass)
+            ) {
+                $container->bindShared($this->providerClass, $instance);
+            }
         }
 
         return $this;
