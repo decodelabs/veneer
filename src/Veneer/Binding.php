@@ -102,8 +102,21 @@ class Binding
 
         foreach ($method->getParameters() as $param) {
             $type = $param->getType();
+            $value = null;
 
             if (
+                $type instanceof ReflectionNamedType &&
+                $container
+            ) {
+                if ($container instanceof PandoraContainer) {
+                    $value = $container->tryGet($type->getName());
+                } elseif ($container->has($type->getName())) {
+                    $value = $container->get($type->getName());
+                }
+            }
+
+            if (
+                $value === null &&
                 $type !== null &&
                 $type->allowsNull()
             ) {
@@ -111,16 +124,13 @@ class Binding
                 continue;
             }
 
-            if (
-                !$type instanceof ReflectionNamedType ||
-                !$container
-            ) {
+            if ($type === null) {
                 throw Exceptional::Definition(
                     'Unable to resolve constructor parameter ' . $param->getName() . ' for ' . $this->providerClass
                 );
             }
 
-            $args[] = $container->get($type->getName());
+            $args[] = $value;
         }
 
         $method->invoke($instance, ...$args);
