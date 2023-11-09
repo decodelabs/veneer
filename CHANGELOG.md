@@ -1,6 +1,7 @@
+## v0.10.21 (2023-11-09)
 * Fixed handling of private and protected class constants
 
-## v0.10.21 (2023-11-09)
+## v0.10.21 (2023-11-08)
 * Improved deferred binding argument handling
 
 ## v0.10.20 (2023-11-07)
