@@ -1,3 +1,4 @@
+## v0.10.21 (2023-11-09)
 * Improved deferred binding argument handling
 
 ## v0.10.20 (2023-11-07)
