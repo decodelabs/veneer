@@ -334,12 +334,16 @@ class Binding
         $consts['VENEER'] = 'const VENEER = \'' . addslashes($this->proxyClass) . '\';';
         $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
 
-        foreach (array_keys($ref->getConstants()) as $key) {
+        foreach ($ref->getReflectionConstants() as $const) {
+            $key = $const->getName();
+
             if ($key === 'VENEER') {
                 continue;
             }
 
-            $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';';
+            if ($const->isPublic()) {
+                $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';';
+            }
         }
 
         $class .= '    ' . implode("\n    ", $consts) . "\n";
