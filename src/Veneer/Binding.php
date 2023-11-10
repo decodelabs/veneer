@@ -11,6 +11,7 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 use DecodeLabs\Pandora\Container as PandoraContainer;
+use DecodeLabs\Slingshot;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 
@@ -98,42 +99,14 @@ class Binding
         $ref = new ReflectionObject($instance);
         $method = $ref->getMethod('__construct');
         $method->setAccessible(true);
-        $args = [];
 
-        foreach ($method->getParameters() as $param) {
-            $type = $param->getType();
-            $value = null;
-
-            if (
-                $type instanceof ReflectionNamedType &&
-                $container
-            ) {
-                if ($container instanceof PandoraContainer) {
-                    $value = $container->tryGet($type->getName());
-                } elseif ($container->has($type->getName())) {
-                    $value = $container->get($type->getName());
-                }
-            }
-
-            if (
-                $value === null &&
-                $type !== null &&
-                $type->allowsNull()
-            ) {
-                $args[] = null;
-                continue;
-            }
-
-            if ($type === null) {
-                throw Exceptional::Definition(
-                    'Unable to resolve constructor parameter ' . $param->getName() . ' for ' . $this->providerClass
-                );
-            }
-
-            $args[] = $value;
+        if (!$closure = $method->getClosure($instance)) {
+            throw Exceptional::Logic(
+                'Unable to get closure for constructor of ' . $this->providerClass
+            );
         }
 
-        $method->invoke($instance, ...$args);
+        (new Slingshot($container))->invoke($closure);
 
         // Load plugins
         $this->loadPlugins();
