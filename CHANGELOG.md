@@ -1,3 +1,6 @@
+* Switched to Slingshot for function invocation
+* Moved to PHP8.1 minimum
+
 ## v0.10.21 (2023-11-09)
 * Fixed handling of private and protected class constants
 
