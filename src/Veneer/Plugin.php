@@ -67,6 +67,7 @@ class Plugin
 
             if (
                 !empty($types) ||
+                !$wrapper instanceof ReflectionNamedType ||
                 $wrapper->getName() !== PluginWrapper::class
             ) {
                 throw Exceptional::Setup('Plugin ' . $name . ' has a complex type');
