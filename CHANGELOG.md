@@ -1,3 +1,6 @@
+## v0.10.25 (2024-04-29)
+* Fixed re-adding early-bound instances to container
+
 ## v0.10.24 (2023-11-14)
 * Fixed Slingshot dependency
 

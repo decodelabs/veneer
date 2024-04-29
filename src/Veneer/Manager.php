@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
+use DecodeLabs\Pandora\Container as PandoraContainer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
@@ -41,6 +42,22 @@ class Manager
         ?ContainerInterface $container
     ): void {
         $this->container = $container;
+
+        if ($container instanceof PandoraContainer) {
+            foreach ($this->bindings as $binding) {
+                $providerClass = $binding->getProviderClass();
+
+                if (
+                    !$binding->hasInstance() ||
+                    $container->has($providerClass) ||
+                    null === ($instance = ($binding->getTarget())::getVeneerProxyTargetInstance())
+                ) {
+                    continue;
+                }
+
+                $container->bindShared($providerClass, $instance);
+            }
+        }
     }
 
     /**
