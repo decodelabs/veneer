@@ -112,7 +112,7 @@ class Binding
             // Invoke constructor with Slingshot
             (new Slingshot($container))->invoke($closure);
         } else {
-            foreach($method->getParameters() as $parameter) {
+            foreach ($method->getParameters() as $parameter) {
                 if (!$parameter->isOptional()) {
                     throw Exceptional::ComponentUnavailable(
                         'Cannot resolve constructor dependencies without Slingshot'
