@@ -1,3 +1,6 @@
+## v0.11.1 (2024-07-17)
+* Improved non-Slingshot object instantiation
+
 ## v0.11.0 (2024-07-17)
 * Made Slingshot optional
 
