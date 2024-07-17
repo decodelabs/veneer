@@ -100,7 +100,7 @@ namespace Some\Other\Code
 }
 ```
 
-Note, if your target class or plugin has a constructor with required parameters, you will need to add <code>decodelabs/slingshot</code> to your project to allow Veneer to instantiate it.
+Note, if your target class has a constructor with required parameters, you will need to add <code>decodelabs/slingshot</code> to your project to allow Veneer to instantiate it.
 
 
 ## Licensing
