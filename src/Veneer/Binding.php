@@ -100,13 +100,27 @@ class Binding
         $method = $ref->getMethod('__construct');
         $method->setAccessible(true);
 
+        // Return value doc mismatch
+        // @phpstan-ignore-next-line
         if (!$closure = $method->getClosure($instance)) {
             throw Exceptional::Logic(
                 'Unable to get closure for constructor of ' . $this->providerClass
             );
         }
 
-        (new Slingshot($container))->invoke($closure);
+        if (class_exists(Slingshot::class)) {
+            // Invoke constructor with Slingshot
+            (new Slingshot($container))->invoke($closure);
+        } else {
+            if (!empty($method->getParameters())) {
+                throw Exceptional::ComponentUnavailable(
+                    'Cannot resolve plugin constructor dependencies without Slingshot'
+                );
+            }
+
+            // Invoke constructor directly
+            $closure();
+        }
 
         // Load plugins
         $this->loadPlugins();
