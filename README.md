@@ -100,6 +100,8 @@ namespace Some\Other\Code
 }
 ```
 
+Note, if your plugin has a constructor with parameters, you will need to add <code>decodelabs/slingshot</code> to your project to allow Veneer to instantiate it.
+
 
 ## Licensing
 Veneer is licensed under the MIT License. See [LICENSE](./LICENSE) for the full license text.

@@ -1,3 +1,5 @@
+* Made Slingshot optional
+
 ## v0.10.25 (2024-04-29)
 * Fixed re-adding early-bound instances to container
 
