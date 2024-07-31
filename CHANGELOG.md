@@ -1,3 +1,4 @@
+## v0.11.2 (2024-07-31)
 * Made all bindings lazy by default
 
 ## v0.11.1 (2024-07-17)
