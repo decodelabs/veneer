@@ -1,3 +1,5 @@
+* Made all bindings lazy by default
+
 ## v0.11.1 (2024-07-17)
 * Improved non-Slingshot object instantiation
 

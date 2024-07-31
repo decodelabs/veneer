@@ -67,8 +67,14 @@ class Binding
     public function isLazyLoader(): bool
     {
         $ref = new ReflectionClass($this->providerClass);
-        $attributes = $ref->getAttributes(LazyLoad::class);
-        return !empty($attributes);
+        $lazy = $ref->getAttributes(LazyLoad::class);
+
+        if (!empty($lazy)) {
+            return true;
+        }
+
+        $eager = $ref->getAttributes(EagerLoad::class);
+        return empty($eager);
     }
 
     /**
