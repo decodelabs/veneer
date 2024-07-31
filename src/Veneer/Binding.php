@@ -67,8 +67,8 @@ class Binding
     public function isLazyLoader(): bool
     {
         $ref = new ReflectionClass($this->providerClass);
-        $attributes = $ref->getAttributes(LazyLoad::class);
-        return !empty($attributes);
+        $eager = $ref->getAttributes(EagerLoad::class);
+        return empty($eager);
     }
 
     /**
@@ -112,7 +112,7 @@ class Binding
             // Invoke constructor with Slingshot
             (new Slingshot($container))->invoke($closure);
         } else {
-            foreach($method->getParameters() as $parameter) {
+            foreach ($method->getParameters() as $parameter) {
                 if (!$parameter->isOptional()) {
                     throw Exceptional::ComponentUnavailable(
                         'Cannot resolve constructor dependencies without Slingshot'
