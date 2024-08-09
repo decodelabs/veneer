@@ -1,3 +1,4 @@
+## v0.11.5 (2024-08-09)
 * Improved context checking in stub generator
 
 ## v0.11.4 (2024-08-09)
