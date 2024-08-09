@@ -46,7 +46,10 @@ class Generator
 
             $path = $file->getPathname();
 
-            if (!str_ends_with($path, '.php')) {
+            if (
+                !str_ends_with($path, '.php') ||
+                str_ends_with($path, 'ootstrap.php')
+            ) {
                 continue;
             }
 

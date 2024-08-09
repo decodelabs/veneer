@@ -1,3 +1,5 @@
+* Ignore bootstraps in stub generator
+
 ## v0.11.3 (2024-08-09)
 * Improved stub generator
 
