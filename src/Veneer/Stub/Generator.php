@@ -12,8 +12,9 @@ namespace DecodeLabs\Veneer\Stub;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Binding;
-
+use DirectoryIterator;
 use ReflectionClass;
+use Throwable;
 
 class Generator
 {
@@ -38,6 +39,25 @@ class Generator
      */
     public function scan(): array
     {
+        foreach (new DirectoryIterator($this->scanDir . '/src') as $file) {
+            if (!$file->isFile()) {
+                continue;
+            }
+
+            $path = $file->getPathname();
+
+            if (!str_ends_with($path, '.php')) {
+                continue;
+            }
+
+            try {
+                require_once $file->getPathname();
+            } catch (Throwable $e) {
+                continue;
+            }
+        }
+
+
         $bindings = [];
         $manager = Veneer::getDefaultManager();
 

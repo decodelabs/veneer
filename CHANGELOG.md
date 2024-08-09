@@ -1,3 +1,5 @@
+* Improved stub generator
+
 ## v0.11.2 (2024-07-31)
 * Made all bindings lazy by default
 
