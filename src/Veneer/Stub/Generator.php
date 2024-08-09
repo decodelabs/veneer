@@ -39,27 +39,7 @@ class Generator
      */
     public function scan(): array
     {
-        foreach (new DirectoryIterator($this->scanDir . '/src') as $file) {
-            if (!$file->isFile()) {
-                continue;
-            }
-
-            $path = $file->getPathname();
-
-            if (
-                !str_ends_with($path, '.php') ||
-                str_ends_with($path, 'ootstrap.php')
-            ) {
-                continue;
-            }
-
-            try {
-                require_once $file->getPathname();
-            } catch (Throwable $e) {
-                continue;
-            }
-        }
-
+        $this->loadRootFiles();
 
         $bindings = [];
         $manager = Veneer::getDefaultManager();
@@ -82,6 +62,40 @@ class Generator
         }
 
         return $bindings;
+    }
+
+    protected function loadRootFiles(): void
+    {
+        if (!is_dir($this->scanDir . '/src')) {
+            return;
+        }
+
+        foreach (new DirectoryIterator($this->scanDir . '/src') as $file) {
+            if (!$file->isFile()) {
+                continue;
+            }
+
+            $path = $file->getPathname();
+
+            if (
+                !str_ends_with($path, '.php') ||
+                str_ends_with($path, 'ootstrap.php')
+            ) {
+                continue;
+            }
+
+            $contents = file_get_contents($path);
+
+            if (!str_contains($contents, 'Veneer::register')) {
+                continue;
+            }
+
+            try {
+                require_once $file->getPathname();
+            } catch (Throwable $e) {
+                continue;
+            }
+        }
     }
 
     /**
