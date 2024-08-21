@@ -320,13 +320,13 @@ class Binding
 
 
         // Constants
-        $consts['VENEER'] = 'const VENEER = \'' . addslashes($this->proxyClass) . '\';';
-        $consts['VENEER_TARGET'] = 'const VENEER_TARGET = Inst::class;';
+        $consts['Veneer'] = 'const Veneer = \'' . addslashes($this->proxyClass) . '\';';
+        $consts['VeneerTarget'] = 'const VeneerTarget = Inst::class;';
 
         foreach ($ref->getReflectionConstants() as $const) {
             $key = $const->getName();
 
-            if ($key === 'VENEER') {
+            if ($key === 'Veneer') {
                 continue;
             }
 
