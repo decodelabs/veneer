@@ -1,3 +1,5 @@
+* Made class constants PascalCase
+
 ## v0.11.5 (2024-08-09)
 * Improved context checking in stub generator
 
