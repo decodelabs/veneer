@@ -320,8 +320,8 @@ class Binding
 
 
         // Constants
-        $consts['Veneer'] = 'const Veneer = \'' . addslashes($this->proxyClass) . '\';';
-        $consts['VeneerTarget'] = 'const VeneerTarget = Inst::class;';
+        $consts['Veneer'] = 'public const Veneer = \'' . addslashes($this->proxyClass) . '\';';
+        $consts['VeneerTarget'] = 'public const VeneerTarget = Inst::class;';
 
         foreach ($ref->getReflectionConstants() as $const) {
             $key = $const->getName();
@@ -331,7 +331,7 @@ class Binding
             }
 
             if ($const->isPublic()) {
-                $consts[$key] = 'const ' . $key . ' = Inst::' . $key . ';';
+                $consts[$key] = 'public const ' . $key . ' = Inst::' . $key . ';';
             }
         }
 
