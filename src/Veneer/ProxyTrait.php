@@ -11,6 +11,9 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 
+/**
+ * @phpstan-require-implements Proxy
+ */
 trait ProxyTrait
 {
     public static ?object $instance = null;

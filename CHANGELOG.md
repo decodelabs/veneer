@@ -1,3 +1,4 @@
+* Added @phpstan-require-implements constraints
 * Added public keyword to binding consts
 
 ## v0.11.6 (2024-08-21)
