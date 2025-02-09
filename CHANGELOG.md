@@ -1,5 +1,6 @@
 * Added @phpstan-require-implements constraints
 * Added public keyword to binding consts
+* Added PHP8.4 to CI workflow
 
 ## v0.11.6 (2024-08-21)
 * Made class constants PascalCase
