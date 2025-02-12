@@ -1,3 +1,5 @@
+* Removed Pandora dev dependency
+
 ## v0.12.2 (2025-02-12)
 * Removed Coercion dependency
 

@@ -187,7 +187,10 @@ class Binding
         object $instance,
         ContainerProvider $containerProvider
     ): void {
-        if(!($container = $containerProvider->container) instanceof PandoraContainer) {
+        if(
+            !class_exists(PandoraContainer::class) ||
+            !($container = $containerProvider->container) instanceof PandoraContainer
+        ) {
             return;
         }
 
