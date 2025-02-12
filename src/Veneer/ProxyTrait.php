@@ -44,7 +44,7 @@ trait ProxyTrait
     ): mixed {
         if (!self::$_veneerInstance) {
             throw Exceptional::Runtime(
-                'No target object has been bound in ' . $name . ' proxy'
+                message: 'No target object has been bound in ' . $name . ' proxy'
             );
         }
 

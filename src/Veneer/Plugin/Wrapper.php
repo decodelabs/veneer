@@ -100,7 +100,7 @@ class Wrapper implements
 
         if (!$this->plugin instanceof ArrayAccess) {
             throw Exceptional::Runtime(
-                'Plugin does not implement ArrayAccess'
+                message: 'Plugin does not implement ArrayAccess'
             );
         }
 
@@ -119,7 +119,7 @@ class Wrapper implements
 
         if (!$this->plugin instanceof ArrayAccess) {
             throw Exceptional::Runtime(
-                'Plugin does not implement ArrayAccess'
+                message: 'Plugin does not implement ArrayAccess'
             );
         }
 
@@ -138,7 +138,7 @@ class Wrapper implements
 
         if (!$this->plugin instanceof ArrayAccess) {
             throw Exceptional::Runtime(
-                'Plugin does not implement ArrayAccess'
+                message: 'Plugin does not implement ArrayAccess'
             );
         }
 
@@ -157,7 +157,7 @@ class Wrapper implements
 
         if (!$this->plugin instanceof ArrayAccess) {
             throw Exceptional::Runtime(
-                'Plugin does not implement ArrayAccess'
+                message: 'Plugin does not implement ArrayAccess'
             );
         }
 
@@ -180,7 +180,7 @@ class Wrapper implements
 
         if (!$this->plugin instanceof Traversable) {
             throw Exceptional::Runtime(
-                'Plugin does not implement Traversable'
+                message: 'Plugin does not implement Traversable'
             );
         }
 

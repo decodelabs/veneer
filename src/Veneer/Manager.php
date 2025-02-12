@@ -160,7 +160,9 @@ class Manager implements ContainerProvider
             return $binding;
         }
 
-        throw Exceptional::Runtime('Unable to find binding for ' . get_class($instance));
+        throw Exceptional::Runtime(
+            message: 'Unable to find binding for ' . get_class($instance)
+        );
     }
 
     /**

@@ -1,4 +1,5 @@
 * Removed Pandora dev dependency
+* Improved Exception syntax
 
 ## v0.12.2 (2025-02-12)
 * Removed Coercion dependency

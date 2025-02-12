@@ -36,7 +36,9 @@ class Plugin
                 $typeRef = $this->property->getType();
 
                 if (!$typeRef instanceof ReflectionNamedType) {
-                    throw Exceptional::Setup('Plugin ' . $this->name . ' is not a Named type');
+                    throw Exceptional::Setup(
+                        message: 'Plugin ' . $this->name . ' is not a Named type'
+                    );
                 }
 
                 /** @var class-string $type */
@@ -51,7 +53,9 @@ class Plugin
     public ReflectionProperty $property {
         get {
             if(!isset($this->property)) {
-                throw Exceptional::Runtime('Plugin property has not been defined');
+                throw Exceptional::Runtime(
+                    message: 'Plugin property has not been defined'
+                );
             }
 
             return $this->property;
@@ -61,7 +65,9 @@ class Plugin
                 isset($this->property) &&
                 $this->property !== $value
             ) {
-                throw Exceptional::Runtime('Plugin property is already defined');
+                throw Exceptional::Runtime(
+                    message: 'Plugin property is already defined'
+                );
             }
 
             $this->property = $value;
@@ -173,7 +179,9 @@ class Plugin
         ContainerProvider $containerProvider
     ): object {
         if (!$this->reflection->isInstantiable()) {
-            throw Exceptional::Setup('Loader has no way to instantiate plugin ' . $this->name);
+            throw Exceptional::Setup(
+                message: 'Loader has no way to instantiate plugin ' . $this->name
+            );
         }
 
         if(class_exists(Slingshot::class)) {
@@ -191,7 +199,7 @@ class Plugin
         foreach($constructor?->getParameters() ?? [] as $parameter) {
             if (!$parameter->isOptional()) {
                 throw Exceptional::ComponentUnavailable(
-                    'Cannot resolve constructor dependencies without Slingshot'
+                    message: 'Cannot resolve constructor dependencies without Slingshot'
                 );
             }
         }
