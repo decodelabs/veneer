@@ -9,12 +9,9 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer;
 
-use Attribute;
+use Psr\Container\ContainerInterface;
 
-#[Attribute(
-    Attribute::TARGET_CLASS |
-    Attribute::TARGET_PROPERTY
-)]
-class EagerLoad
+interface ContainerProvider
 {
+    public ?ContainerInterface $container { get; }
 }

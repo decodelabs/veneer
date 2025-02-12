@@ -1,0 +1,5 @@
+services:
+    -
+        class: DecodeLabs\PHPStan\VeneerReflectionExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension

@@ -11,25 +11,28 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 
+/**
+ * @phpstan-require-implements Proxy
+ */
 trait ProxyTrait
 {
-    public static ?object $instance = null;
+    protected static ?object $_veneerInstance = null;
 
     /**
      * Set Veneer Proxy target instance
      */
-    public static function setVeneerProxyTargetInstance(
+    public static function _setVeneerInstance(
         object $instance
     ): void {
-        self::$instance = $instance;
+        self::$_veneerInstance = $instance;
     }
 
     /**
      * Get Veneer Proxy target instance
      */
-    public static function getVeneerProxyTargetInstance(): ?object
+    public static function _getVeneerInstance(): ?object
     {
-        return self::$instance;
+        return self::$_veneerInstance;
     }
 
     /**
@@ -39,12 +42,12 @@ trait ProxyTrait
         string $name,
         array $args
     ): mixed {
-        if (!self::$instance) {
+        if (!self::$_veneerInstance) {
             throw Exceptional::Runtime(
                 'No target object has been bound in ' . $name . ' proxy'
             );
         }
 
-        return self::$instance->{$name}(...$args);
+        return self::$_veneerInstance->{$name}(...$args);
     }
 }

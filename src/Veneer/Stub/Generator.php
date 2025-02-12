@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer\Stub;
 
-use DecodeLabs\Exceptional;
 use DecodeLabs\Veneer;
+use DecodeLabs\Veneer\Manager;
 use DecodeLabs\Veneer\Binding;
+use DecodeLabs\Veneer\Proxy\ClassGenerator;
 use DirectoryIterator;
 use ReflectionClass;
 use Throwable;
@@ -40,11 +41,9 @@ class Generator
     public function scan(): array
     {
         $this->loadRootFiles();
-
         $bindings = [];
-        $manager = Veneer::getDefaultManager();
 
-        foreach ($manager->getBindings() as $binding) {
+        foreach (Manager::getGlobalManager()->getBindings() as $binding) {
             $ref = new ReflectionClass($binding->getProviderClass());
 
             if (!$file = $ref->getFileName()) {
@@ -84,9 +83,14 @@ class Generator
                 continue;
             }
 
-            $contents = file_get_contents($path);
+            if(false === ($contents = file_get_contents($path))) {
+                continue;
+            }
 
-            if (!str_contains($contents, 'Veneer::register')) {
+            if (
+                !str_contains($contents, 'Veneer::register') &&
+                !str_contains($contents, '::getGlobalManager()->register')
+            ) {
                 continue;
             }
 
@@ -116,16 +120,10 @@ PHP;
         $parts = explode('\\', $proxyClass);
         $fileName = implode('/', $parts);
 
-        $instance = $binding->getTarget()->getVeneerProxyTargetInstance();
+        $generator = new ClassGenerator($binding);
 
-        if (!is_object($instance)) {
-            throw Exceptional::Setup($proxyClass . ' instance has not been bound');
-        }
-
-        $code .= $binding->generateBindingClass(
-            null,
-            get_class($instance),
-            true
+        $code .= $generator->generate(
+            withMethods: true
         );
 
         $filePath = $this->stubDir . '/' . $fileName . '.php';
