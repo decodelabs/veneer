@@ -386,6 +386,13 @@ class Binding
         object $instance,
         ContainerProvider $containerProvider
     ): object {
+        // Already loaded
+        if($plugin->property->isInitialized($instance)) {
+            /** @var object */
+            $output = $plugin->property->getValue($instance);
+            return $output;
+        }
+
         // Instant load eager auto
         if($plugin->strategy->isEagerAuto()) {
             // Use isset to trigger get hooks
