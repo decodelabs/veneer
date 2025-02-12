@@ -19,7 +19,6 @@
     "require-dev": {
         "composer-runtime-api": "^2.2",
 
-        "decodelabs/coercion": "^0.2.15",
         "decodelabs/pandora": "^0.2.16",
         "decodelabs/slingshot": "^0.1.1",
         "decodelabs/phpstan-decodelabs": "^0.7"

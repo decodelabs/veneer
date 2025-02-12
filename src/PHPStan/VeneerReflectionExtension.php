@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace DecodeLabs\PHPStan;
 
-use DecodeLabs\Coercion;
 use DecodeLabs\PHPStan\StaticMethodReflection;
 use DecodeLabs\Veneer\Proxy;
 use Exception;
@@ -36,9 +35,10 @@ class VeneerReflectionExtension implements MethodsClassReflectionExtension
         $class = $classReflection->getName();
 
         if ($classReflection->implementsInterface(Proxy::class)) {
-            return $this->reflectionProvider->getClass(
-                Coercion::toString($class::VeneerTarget)
-            )
+            /** @var class-string */
+            $veneerTarget = $class::VeneerTarget;
+
+            return $this->reflectionProvider->getClass($veneerTarget)
                 ->hasMethod($methodName);
         }
 
@@ -55,10 +55,11 @@ class VeneerReflectionExtension implements MethodsClassReflectionExtension
             throw new Exception('Unable to get method');
         }
 
+        /** @var class-string */
+        $veneerTarget = $class::VeneerTarget;
+
         return new StaticMethodReflection(
-            $this->reflectionProvider->getClass(
-                Coercion::toString($class::VeneerTarget)
-            )
+            $this->reflectionProvider->getClass($veneerTarget)
                 ->getMethod($methodName, new OutOfClassScope())
         );
     }

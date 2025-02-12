@@ -1,3 +1,6 @@
+## v0.12.2 (2025-02-12)
+* Removed Coercion dependency
+
 ## v0.12.1 (2025-02-12)
 * Fixed plugin binding for non-lazy providers
 
