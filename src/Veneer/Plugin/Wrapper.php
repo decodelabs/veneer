@@ -27,6 +27,9 @@ class Wrapper implements
     IteratorAggregate,
     Dumpable
 {
+    /**
+     * @var Closure(): T
+     */
     protected Closure $loader;
 
     /**

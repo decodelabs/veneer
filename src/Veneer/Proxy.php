@@ -11,11 +11,11 @@ namespace DecodeLabs\Veneer;
 
 interface Proxy
 {
-    public static function setVeneerProxyTargetInstance(
+    public static function _setVeneerInstance(
         object $instance
     ): void;
 
-    public static function getVeneerProxyTargetInstance(): ?object;
+    public static function _getVeneerInstance(): ?object;
 
     /**
      * @param array<mixed> $args

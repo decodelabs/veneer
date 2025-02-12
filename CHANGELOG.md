@@ -1,6 +1,17 @@
-* Added @phpstan-require-implements constraints
+## v0.12.0 (2025-02-12)
+* Simplified binding structure
+* Made Veneer manager a proxy
+* Use ghosts and proxies for lazy loading
+* Removed SelfLoader interface
+* Removed LazyLoad attribute
+* Added support for property hooks
 * Added public keyword to binding consts
+* Added support for never-returning methods in Stubs
+* Upgraded PHPStan to v2
+* Added @phpstan-require-implements constraints
+* Added Proxy analyze test
 * Added PHP8.4 to CI workflow
+* Made PHP8.4 minimum version
 
 ## v0.11.6 (2024-08-21)
 * Made class constants PascalCase

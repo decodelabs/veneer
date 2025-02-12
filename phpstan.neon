@@ -1,6 +1,9 @@
 parameters:
     paths:
         - src/
+        - tests/
+
     excludePaths:
-        - src/Veneer/Stub/
+        #- src/Veneer/Stub/
+
     level: max

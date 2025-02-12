@@ -14,84 +14,85 @@ use DecodeLabs\Pandora\Container as PandoraContainer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
-class Manager
+class Manager implements ContainerProvider
 {
+    private static ?Manager $instance = null;
+
     /**
      * @var array<string, Binding>
      */
     protected array $bindings = [];
 
-    protected ?ContainerInterface $container = null;
-    protected bool $deferrals = true;
+    public ?ContainerInterface $container = null {
+        get => $this->container;
+        set {
+            $this->container = $value;
 
-    /**
-     * Init with container and loader
-     */
-    public function __construct(
-        ?ContainerInterface $container = null
-    ) {
-        $this->setContainer($container);
-        spl_autoload_register([$this, 'handleAutoload']);
-    }
+            if ($this->container instanceof PandoraContainer) {
+                foreach ($this->bindings as $binding) {
+                    $providerClass = $binding->getProviderClass();
 
+                    if (
+                        !$binding->hasInstance() ||
+                        $this->container->has($providerClass) ||
+                        null === ($instance = ($binding->getProxy())::_getVeneerInstance())
+                    ) {
+                        continue;
+                    }
 
-    /**
-     * Set PSR11 container
-     */
-    public function setContainer(
-        ?ContainerInterface $container
-    ): void {
-        $this->container = $container;
-
-        if ($container instanceof PandoraContainer) {
-            foreach ($this->bindings as $binding) {
-                $providerClass = $binding->getProviderClass();
-
-                if (
-                    !$binding->hasInstance() ||
-                    $container->has($providerClass) ||
-                    null === ($instance = ($binding->getTarget())::getVeneerProxyTargetInstance())
-                ) {
-                    continue;
+                    $this->container->bindShared($providerClass, $instance);
                 }
-
-                $container->bindShared($providerClass, $instance);
             }
         }
     }
 
+    public function setContainer(
+        ContainerInterface $container
+    ): void {
+        $this->container = $container;
+    }
+
+
     /**
-     * Get PSR11 container
+     * Get singleton instance
      */
-    public function getContainer(): ?ContainerInterface
+    public static function getGlobalManager(): Manager
     {
-        return $this->container;
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+
+    /**
+     * Init with container and loader
+     */
+    public function __construct() {
+        spl_autoload_register($this->mount(...));
     }
 
 
     /**
      * Handle autoload
      */
-    public function handleAutoload(
+    protected function mount(
         string $class
     ): void {
         if (!isset($this->bindings[$class])) {
             return;
         }
 
-        $this->bindProxy($this->bindings[$class]);
+        $binding = $this->bindings[$class];
+
+        if (!$binding->hasInstance()) {
+            $binding->mount($this);
+        }
+
+        $bindingClass = get_class($binding->getProxy());
+        class_alias($bindingClass, $binding->getProxyClass());
     }
-
-
-    /**
-     * Set deferral resolution on or off
-     */
-    public function setDeferrals(
-        bool $flag
-    ): void {
-        $this->deferrals = $flag;
-    }
-
 
     /**
      * Add alias that can be used from root namespace
@@ -99,7 +100,7 @@ class Manager
      * @param class-string $providerClass
      * @param class-string $proxyClass
      */
-    public function bind(
+    public function register(
         string $providerClass,
         string $proxyClass
     ): bool {
@@ -110,32 +111,7 @@ class Manager
         $binding = new Binding($providerClass, $proxyClass);
         $this->bindings[$binding->getProxyClass()] = $binding;
 
-        if (!$binding->isLazyLoader()) {
-            $this->bindProxy($binding);
-        }
-
         return true;
-    }
-
-    /**
-     * Bind proxy
-     */
-    protected function bindProxy(
-        Binding $binding
-    ): void {
-        if (!$binding->hasInstance()) {
-            $binding->bindInstance($this->container);
-        }
-
-        $bindingClass = get_class($binding->getTarget());
-        class_alias($bindingClass, $binding->getProxyClass());
-
-        if (
-            $binding->isDeferred() &&
-            $this->deferrals
-        ) {
-            $binding->resolveDeferral($this->container);
-        }
     }
 
     /**
@@ -148,52 +124,6 @@ class Manager
     }
 
     /**
-     * Has class been bound with plugin?
-     */
-    public function hasPlugin(
-        string $proxyClass,
-        string $pluginName
-    ): bool {
-        if (!$binding = ($this->bindings[$proxyClass] ?? null)) {
-            return false;
-        }
-
-        if (!$binding->hasInstance()) {
-            $binding->bindInstance($this->container);
-        }
-
-        return $binding->hasPlugin($pluginName);
-    }
-
-    /**
-     * Ensure instance has plugin
-     */
-    public function ensurePlugin(
-        object $instance,
-        string $name
-    ): void {
-        if (isset($instance->{$name})) {
-            return;
-        }
-
-        $binding = $this->getBindingForInstance($instance);
-        $names = $binding->getPluginNames();
-
-        if (!in_array($name, $names)) {
-            throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
-        }
-
-        $target = $binding->getTarget();
-        $plugin = $target::$$name;
-
-        if ($plugin instanceof PluginWrapper) {
-            $plugin = $plugin->getVeneerPlugin();
-        }
-
-        $instance->{$name} = $plugin;
-    }
-
-    /**
      * Replace instance of plugin
      */
     public function replacePlugin(
@@ -202,15 +132,14 @@ class Manager
         mixed $plugin
     ): void {
         $binding = $this->getBindingForInstance($instance);
-        $names = $binding->getPluginNames();
 
-        if (!in_array($name, $names)) {
+        if (!$pluginAttr = $binding->getPlugin($name)) {
             throw Exceptional::Runtime(get_class($instance) . ' does not have plugin ' . $name);
         }
 
-        $instance->{$name} = $plugin;
-        $target = $binding->getTarget();
-        $target::$$name = $plugin;
+        $pluginAttr->property->setValue($instance, $plugin);
+        $proxy = $binding->getProxy();
+        $proxy::$$name = $plugin;
     }
 
     /**
@@ -243,7 +172,7 @@ class Manager
 
         foreach ($this->bindings as $name => $binding) {
             if (!$binding->hasInstance()) {
-                $binding->bindInstance($this->container);
+                $binding->mount($this);
             }
 
             $output[$name] = $binding;
@@ -265,7 +194,7 @@ class Manager
         $binding = $this->bindings[$name];
 
         if (!$binding->hasInstance()) {
-            $binding->bindInstance($this->container);
+            $binding->mount($this);
         }
 
         return $binding;
