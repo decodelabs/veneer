@@ -1,3 +1,6 @@
+## v0.12.1 (2025-02-12)
+* Fixed plugin binding for non-lazy providers
+
 ## v0.12.0 (2025-02-12)
 * Simplified binding structure
 * Made Veneer manager a proxy
