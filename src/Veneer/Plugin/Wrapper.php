@@ -14,6 +14,7 @@ use Closure;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Glitch\Dumpable;
 use IteratorAggregate;
+use Stringable;
 use Traversable;
 
 /**
@@ -25,6 +26,7 @@ use Traversable;
 class Wrapper implements
     ArrayAccess,
     IteratorAggregate,
+    Stringable,
     Dumpable
 {
     /**
@@ -187,6 +189,23 @@ class Wrapper implements
         return $this->plugin;
     }
 
+    /**
+     * Convert to string
+     */
+    public function __toString(): string
+    {
+        if($this->plugin === null) {
+            $this->getVeneerPlugin();
+        }
+
+        if(!$this->plugin instanceof Stringable) {
+            throw Exceptional::Runtime(
+                message: 'Plugin does not implement Stringable'
+            );
+        }
+
+        return $this->plugin->__toString();
+    }
 
     /**
      * Export for dump inspection

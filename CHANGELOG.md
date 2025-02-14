@@ -1,3 +1,5 @@
+## v0.12.3 (2025-02-14)
+* Added Stringable to Wrapper
 * Removed Pandora dev dependency
 * Improved Exception syntax
 * Updated dependencies
