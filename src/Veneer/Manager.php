@@ -11,7 +11,6 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 use DecodeLabs\Pandora\Container as PandoraContainer;
-use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use Psr\Container\ContainerInterface;
 
 class Manager implements ContainerProvider
@@ -28,7 +27,10 @@ class Manager implements ContainerProvider
         set {
             $this->container = $value;
 
-            if ($this->container instanceof PandoraContainer) {
+            if (
+                class_exists(PandoraContainer::class) &&
+                $this->container instanceof PandoraContainer
+            ) {
                 foreach ($this->bindings as $binding) {
                     $providerClass = $binding->getProviderClass();
 
@@ -158,7 +160,9 @@ class Manager implements ContainerProvider
             return $binding;
         }
 
-        throw Exceptional::Runtime('Unable to find binding for ' . get_class($instance));
+        throw Exceptional::Runtime(
+            message: 'Unable to find binding for ' . get_class($instance)
+        );
     }
 
     /**

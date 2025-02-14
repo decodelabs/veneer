@@ -125,7 +125,7 @@ class Binding
                     if($needsSlingshot) {
                         if(!class_exists(Slingshot::class)) {
                             throw Exceptional::ComponentUnavailable(
-                                'Cannot resolve constructor dependencies without Slingshot'
+                                message: 'Cannot resolve constructor dependencies without Slingshot'
                             );
                         }
 
@@ -187,7 +187,10 @@ class Binding
         object $instance,
         ContainerProvider $containerProvider
     ): void {
-        if(!($container = $containerProvider->container) instanceof PandoraContainer) {
+        if(
+            !class_exists(PandoraContainer::class) ||
+            !($container = $containerProvider->container) instanceof PandoraContainer
+        ) {
             return;
         }
 
@@ -363,7 +366,9 @@ class Binding
         ContainerProvider $containerProvider
     ): void {
         if ($this->proxy === null) {
-            throw Exceptional::Setup('Target binding has not been created');
+            throw Exceptional::Setup(
+                message: 'Target binding has not been created'
+            );
         }
 
         $instRef = new ReflectionClass($instance);
