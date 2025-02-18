@@ -1,3 +1,6 @@
+## v0.12.4 (2025-02-18)
+* Control mounting when fetching bindings
+
 ## v0.12.3 (2025-02-14)
 * Added Stringable to Wrapper
 * Removed Pandora dev dependency

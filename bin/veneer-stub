@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer;
 
-use DecodeLabs\Veneer\Stub\Generator;
+use DecodeLabs\Veneer;
 
 require_once $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
 
@@ -22,7 +22,7 @@ $stubDir = $_SERVER['argv'][1] ?? 'stubs/';
 $scanDir = getcwd();
 
 // Scan
-$generator = new Generator($scanDir, $stubDir);
+$generator = Veneer::newStubGenerator($scanDir, $stubDir);
 $bindings = $generator->scan();
 
 function colorOut(int|string $color, string $message): void

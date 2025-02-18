@@ -11,6 +11,7 @@ namespace DecodeLabs\Veneer;
 
 use DecodeLabs\Exceptional;
 use DecodeLabs\Pandora\Container as PandoraContainer;
+use DecodeLabs\Veneer\Stub\Generator as StubGenerator;
 use Psr\Container\ContainerInterface;
 
 class Manager implements ContainerProvider
@@ -168,10 +169,15 @@ class Manager implements ContainerProvider
     /**
      * Get all bindings
      *
-     * @return array<string, Binding>
+     * @return array<string,Binding>
      */
-    public function getBindings(): array
-    {
+    public function getBindings(
+        bool $mount = false
+    ): array {
+        if(!$mount) {
+            return $this->bindings;
+        }
+
         $output = [];
 
         foreach ($this->bindings as $name => $binding) {
@@ -189,7 +195,8 @@ class Manager implements ContainerProvider
      * Get single binding
      */
     public function getBinding(
-        string $name
+        string $name,
+        bool $mount = false
     ): ?Binding {
         if (!isset($this->bindings[$name])) {
             return null;
@@ -197,10 +204,24 @@ class Manager implements ContainerProvider
 
         $binding = $this->bindings[$name];
 
-        if (!$binding->hasInstance()) {
+        if (
+            $mount &&
+            !$binding->hasInstance()
+        ) {
             $binding->mount($this);
         }
 
         return $binding;
+    }
+
+
+    /**
+     * Create new stub generator
+     */
+    public function newStubGenerator(
+        string $scanDir,
+        string $stubDir
+    ): StubGenerator {
+        return new StubGenerator($scanDir, $stubDir);
     }
 }
