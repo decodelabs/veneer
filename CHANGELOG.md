@@ -1,3 +1,7 @@
+## v0.12.5 (2025-02-18)
+* Fixed instance access in ClassGenerator
+* Ensure plugins are scanned regardless of mount status
+
 ## v0.12.4 (2025-02-18)
 * Control mounting when fetching bindings
 
