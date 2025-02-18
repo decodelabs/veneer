@@ -43,7 +43,7 @@ class Generator
         $this->loadRootFiles();
         $bindings = [];
 
-        foreach (Manager::getGlobalManager()->getBindings() as $binding) {
+        foreach (Manager::getGlobalManager()->getBindings(mount: false) as $binding) {
             $ref = new ReflectionClass($binding->getProviderClass());
 
             if (!$file = $ref->getFileName()) {

@@ -10,6 +10,7 @@ use DecodeLabs\Veneer\ProxyTrait as ProxyTrait;
 use DecodeLabs\Veneer\Manager as Inst;
 use Psr\Container\ContainerInterface as Ref0;
 use DecodeLabs\Veneer\Binding as Ref1;
+use DecodeLabs\Veneer\Stub\Generator as Ref2;
 
 class Veneer implements Proxy
 {
@@ -31,10 +32,13 @@ class Veneer implements Proxy
         return static::$_veneerInstance->has(...func_get_args());
     }
     public static function replacePlugin(object $instance, string $name, mixed $plugin): void {}
-    public static function getBindings(): array {
-        return static::$_veneerInstance->getBindings();
+    public static function getBindings(bool $mount = false): array {
+        return static::$_veneerInstance->getBindings(...func_get_args());
     }
-    public static function getBinding(string $name): ?Ref1 {
+    public static function getBinding(string $name, bool $mount = false): ?Ref1 {
         return static::$_veneerInstance->getBinding(...func_get_args());
+    }
+    public static function newStubGenerator(string $scanDir, string $stubDir): Ref2 {
+        return static::$_veneerInstance->newStubGenerator(...func_get_args());
     }
 };
