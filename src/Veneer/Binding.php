@@ -370,14 +370,19 @@ class Binding
         }
 
         $instRef = new ReflectionClass($instance);
-        $isInstanceLazy = $instRef->isUninitializedLazyObject($instance);
+        $instanceLazy = $instRef->isUninitializedLazyObject($instance);
 
         foreach ($this->getPlugins() as $name => $plugin) {
-            $this->proxy::$$name = $object = $this->loadPlugin($plugin, $instance, $containerProvider);
+            $this->proxy::$$name = $object = $this->loadPlugin(
+                plugin: $plugin,
+                instance: $instance,
+                instanceLazy: $instanceLazy,
+                containerProvider: $containerProvider
+            );
 
             if(
                 !$object instanceof PluginWrapper &&
-                !$isInstanceLazy
+                !$instanceLazy
             ) {
                 $plugin->property->setValue($instance, $object);
             }
@@ -387,10 +392,14 @@ class Binding
     private function loadPlugin(
         Plugin $plugin,
         object $instance,
+        bool $instanceLazy,
         ContainerProvider $containerProvider
     ): object {
         // Already loaded
-        if($plugin->property->isInitialized($instance)) {
+        if(
+            !$instanceLazy &&
+            $plugin->property->isInitialized($instance)
+        ) {
             /** @var object */
             $output = $plugin->property->getValue($instance);
             return $output;

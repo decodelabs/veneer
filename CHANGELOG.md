@@ -1,3 +1,6 @@
+## v0.12.6 (2025-02-18)
+* Avoid instantiating instance while checking plugin initialization
+
 ## v0.12.5 (2025-02-18)
 * Fixed instance access in ClassGenerator
 * Ensure plugins are scanned regardless of mount status
