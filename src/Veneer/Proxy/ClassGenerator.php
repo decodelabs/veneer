@@ -33,13 +33,17 @@ class ClassGenerator {
         bool $withMethods = false,
     ): string {
         if($this->instanceClass === null) {
-            $instance = $this->binding->getProxy()->_getVeneerInstance();
+            if($this->binding->hasInstance()) {
+                $instance = $this->binding->getInstance();
 
-            if (!is_object($instance)) {
-                throw Exceptional::Setup($this->binding->getProxyClass() . ' instance has not been bound');
+                if (!is_object($instance)) {
+                    throw Exceptional::Setup($this->binding->getProxyClass() . ' instance has not been bound');
+                }
+
+                $this->instanceClass = get_class($instance);
+            } else {
+                $this->instanceClass = $this->binding->getProviderClass();
             }
-
-            $this->instanceClass = get_class($instance);
         }
 
         $ref = new ReflectionClass($this->instanceClass);

@@ -314,17 +314,15 @@ class Binding
     /**
      * Get plugins
      *
-     * @return array<string, Plugin>
+     * @return array<string,Plugin>
      */
     public function getPlugins(): array
     {
         if ($this->plugins === null) {
-            throw Exceptional::Runtime(
-                message: 'Proxy ' . $this->proxyClass . ' has not been bound to target yet',
-                data: $this
-            );
+            $this->scanPlugins();
         }
 
+        /** @var array<string,Plugin> */
         return $this->plugins;
     }
 
