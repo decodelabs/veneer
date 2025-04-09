@@ -1,3 +1,6 @@
+## v0.12.7 (2025-04-09)
+* Fixed Plugin type handling
+
 ## v0.12.6 (2025-02-18)
 * Avoid instantiating instance while checking plugin initialization
 
