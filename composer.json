@@ -18,7 +18,7 @@
     "require-dev": {
         "composer-runtime-api": "^2.2",
 
-        "decodelabs/slingshot": "^0.1.12",
+        "decodelabs/slingshot": "^0.2",
         "decodelabs/phpstan-decodelabs": "^0.7"
     },
     "suggest": {
