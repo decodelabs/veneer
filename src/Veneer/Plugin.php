@@ -13,12 +13,9 @@ use Attribute;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Slingshot;
 use DecodeLabs\Veneer\Plugin\Strategy;
-use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionNamedType;
-use ReflectionObject;
 use ReflectionProperty;
-use ReflectionUnionType;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Plugin
@@ -48,6 +45,13 @@ class Plugin
 
             return $this->type;
         }
+    }
+
+    /**
+     * @var class-string $instanceType
+     */
+    public string $instanceType {
+        get => $this->instanceType ?? $this->type;
     }
 
     public ReflectionProperty $property {
@@ -118,7 +122,7 @@ class Plugin
         }
 
         if($type !== null) {
-            $this->type = $type;
+            $this->instanceType = $type;
         }
     }
 
@@ -178,7 +182,9 @@ class Plugin
         object $instance,
         ContainerProvider $containerProvider
     ): object {
-        if (!$this->reflection->isInstantiable()) {
+        $reflection = new ReflectionClass($this->instanceType);
+
+        if (!$reflection->isInstantiable()) {
             throw Exceptional::Setup(
                 message: 'Loader has no way to instantiate plugin ' . $this->name
             );
@@ -187,7 +193,7 @@ class Plugin
         if(class_exists(Slingshot::class)) {
             $slingshot = new Slingshot($containerProvider->container);
             $slingshot->addType($instance);
-            return $slingshot->newInstance($this->type);
+            return $slingshot->newInstance($this->instanceType);
         }
 
         if(!$this->reflection->hasMethod('__construct')) {
