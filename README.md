@@ -11,8 +11,6 @@
 
 Use Veneer to provide easy access to your most commonly used functionality without sacrificing testability.
 
-_Get news and updates on the [DecodeLabs blog](https://blog.decodelabs.com)._
-
 ---
 
 ## Install
