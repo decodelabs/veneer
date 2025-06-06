@@ -193,7 +193,10 @@ class Plugin
         if(class_exists(Slingshot::class)) {
             $slingshot = new Slingshot($containerProvider->container);
             $slingshot->addType($instance);
-            return $slingshot->newInstance($this->instanceType);
+            $output = $slingshot->newInstance($this->instanceType);
+
+            /** @var object $output */
+            return $output;
         }
 
         if(!$this->reflection->hasMethod('__construct')) {

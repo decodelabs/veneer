@@ -12,7 +12,6 @@ namespace DecodeLabs\Veneer\Plugin;
 use ArrayAccess;
 use Closure;
 use DecodeLabs\Exceptional;
-use DecodeLabs\Glitch\Dumpable;
 use IteratorAggregate;
 use Stringable;
 use Traversable;
@@ -26,8 +25,7 @@ use Traversable;
 class Wrapper implements
     ArrayAccess,
     IteratorAggregate,
-    Stringable,
-    Dumpable
+    Stringable
 {
     /**
      * @var Closure(): T
@@ -205,20 +203,5 @@ class Wrapper implements
         }
 
         return $this->plugin->__toString();
-    }
-
-    /**
-     * Export for dump inspection
-     *
-     * @return iterable<string, mixed>
-     */
-    public function glitchDump(): iterable
-    {
-        if ($this->plugin === null) {
-            $this->getVeneerPlugin();
-        }
-
-        yield 'className' => '@PluginWrapper';
-        yield 'value' => $this->plugin;
     }
 }

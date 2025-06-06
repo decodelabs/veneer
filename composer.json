@@ -12,14 +12,15 @@
         "php": "^8.4",
         "psr/container": "^2.0.2",
 
-        "decodelabs/exceptional": "^0.5.2",
-        "decodelabs/glitch-support": "^0.5.1"
+        "decodelabs/exceptional": "^0.6"
     },
     "require-dev": {
         "composer-runtime-api": "^2.2",
 
-        "decodelabs/slingshot": "^0.2",
         "decodelabs/phpstan-decodelabs": "^0.7"
+    },
+    "conflict": {
+        "decodelabs/slingshot": "<0.2"
     },
     "suggest": {
         "decodelabs/slingshot": "Complex plugin instantiation support"
