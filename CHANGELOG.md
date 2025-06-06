@@ -5,9 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
+--
+
+---
+
+### [v0.12.8](https://github.com/decodelabs/veneer/commits/v0.12.8) - 6th June 2025
+
 - Removed dump handling dependencies
 - Upgraded Exceptional to v0.6
 - Removed Slingshot from deps list
+
+[Full list of changes](https://github.com/decodelabs/veneer/compare/v0.12.7...v0.12.8)
 
 ---
 
