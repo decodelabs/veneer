@@ -29,7 +29,7 @@ class Plugin
      */
     public string $type {
         get {
-            if(!isset($this->type)) {
+            if (!isset($this->type)) {
                 $typeRef = $this->property->getType();
 
                 if (!$typeRef instanceof ReflectionNamedType) {
@@ -56,7 +56,7 @@ class Plugin
 
     public ReflectionProperty $property {
         get {
-            if(!isset($this->property)) {
+            if (!isset($this->property)) {
                 throw Exceptional::Runtime(
                     message: 'Plugin property has not been defined'
                 );
@@ -65,7 +65,7 @@ class Plugin
             return $this->property;
         }
         set {
-            if(
+            if (
                 isset($this->property) &&
                 $this->property !== $value
             ) {
@@ -78,7 +78,7 @@ class Plugin
         }
     }
 
-    protected(set) Strategy $strategy = Strategy::Manual;
+    public protected(set) Strategy $strategy = Strategy::Manual;
 
     public bool $auto {
         get => $this->strategy->isAuto();
@@ -94,7 +94,7 @@ class Plugin
      */
     public ReflectionClass $reflection {
         get {
-            if(!isset($this->reflection)) {
+            if (!isset($this->reflection)) {
                 $this->reflection = new ReflectionClass($this->type);
             }
 
@@ -113,26 +113,28 @@ class Plugin
         bool $lazy = false,
         ?string $type = null
     ) {
-        if($lazy) {
+        if ($lazy) {
             $this->strategy = Strategy::Lazy;
-        } elseif($auto) {
+        } elseif ($auto) {
             $this->strategy = Strategy::Auto;
         } else {
             $this->strategy = Strategy::Manual;
         }
 
-        if($type !== null) {
+        if ($type !== null) {
             $this->instanceType = $type;
         }
     }
 
-    public function isInstantiable(): bool {
+    public function isInstantiable(): bool
+    {
         return
             $this->reflection->isInstantiable() &&
             !$this->reflection->isInternal();
     }
 
-    public function requiresWrapper(): bool {
+    public function requiresWrapper(): bool
+    {
         return
             !$this->isInstantiable() &&
             (
@@ -157,7 +159,7 @@ class Plugin
             !$this->property->isLazy($instance) &&
             null !== ($output = $this->property->getValue($instance))
         ) {
-            if($output !== $proxy) {
+            if ($output !== $proxy) {
                 /** @var object $output */
                 return $output;
             }
@@ -165,9 +167,9 @@ class Plugin
 
 
         // Instantiated
-        if(!$this->auto) {
+        if (!$this->auto) {
             throw Exceptional::Setup(
-                message: 'Manual plugin property '.get_class($instance).'::$' . $this->name . ' has not been instantiated by constructor',
+                message: 'Manual plugin property ' . get_class($instance) . '::$' . $this->name . ' has not been instantiated by constructor',
                 data: $instance
             );
         }
@@ -190,7 +192,7 @@ class Plugin
             );
         }
 
-        if(class_exists(Slingshot::class)) {
+        if (class_exists(Slingshot::class)) {
             $slingshot = new Slingshot($containerProvider->container);
             $slingshot->addType($instance);
             $output = $slingshot->newInstance($this->instanceType);
@@ -199,13 +201,13 @@ class Plugin
             return $output;
         }
 
-        if(!$this->reflection->hasMethod('__construct')) {
+        if (!$this->reflection->hasMethod('__construct')) {
             return $this->reflection->newInstance();
         }
 
         $constructor = $this->reflection->getConstructor();
 
-        foreach($constructor?->getParameters() ?? [] as $parameter) {
+        foreach ($constructor?->getParameters() ?? [] as $parameter) {
             if (!$parameter->isOptional()) {
                 throw Exceptional::ComponentUnavailable(
                     message: 'Cannot resolve constructor dependencies without Slingshot'

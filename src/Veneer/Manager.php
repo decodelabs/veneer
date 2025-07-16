@@ -72,7 +72,8 @@ class Manager implements ContainerProvider
     /**
      * Init with container and loader
      */
-    public function __construct() {
+    public function __construct()
+    {
         spl_autoload_register($this->mount(...));
     }
 
@@ -174,7 +175,7 @@ class Manager implements ContainerProvider
     public function getBindings(
         bool $mount = false
     ): array {
-        if(!$mount) {
+        if (!$mount) {
             return $this->bindings;
         }
 

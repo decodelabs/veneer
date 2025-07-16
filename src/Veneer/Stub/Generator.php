@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Veneer\Stub;
 
-use DecodeLabs\Veneer;
-use DecodeLabs\Veneer\Manager;
 use DecodeLabs\Veneer\Binding;
+use DecodeLabs\Veneer\Manager;
 use DecodeLabs\Veneer\Proxy\ClassGenerator;
 use DirectoryIterator;
 use ReflectionClass;
@@ -83,7 +82,7 @@ class Generator
                 continue;
             }
 
-            if(false === ($contents = file_get_contents($path))) {
+            if (false === ($contents = file_get_contents($path))) {
                 continue;
             }
 

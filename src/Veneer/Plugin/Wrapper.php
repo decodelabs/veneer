@@ -192,11 +192,11 @@ class Wrapper implements
      */
     public function __toString(): string
     {
-        if($this->plugin === null) {
+        if ($this->plugin === null) {
             $this->getVeneerPlugin();
         }
 
-        if(!$this->plugin instanceof Stringable) {
+        if (!$this->plugin instanceof Stringable) {
             throw Exceptional::Runtime(
                 message: 'Plugin does not implement Stringable'
             );

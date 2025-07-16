@@ -18,8 +18,8 @@ use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
-class ClassGenerator {
-
+class ClassGenerator
+{
     public function __construct(
         public Binding $binding,
 
@@ -32,8 +32,8 @@ class ClassGenerator {
         ?string $namespace = null,
         bool $withMethods = false,
     ): string {
-        if($this->instanceClass === null) {
-            if($this->binding->hasInstance()) {
+        if ($this->instanceClass === null) {
+            if ($this->binding->hasInstance()) {
                 $instance = $this->binding->getInstance();
 
                 if (!is_object($instance)) {
@@ -293,7 +293,7 @@ class ClassGenerator {
         ) {
             return 'Inst';
         } else {
-            /** @var int $ref */
+            /** @var int */
             static $ref = 0;
             $test = array_flip($uses);
 

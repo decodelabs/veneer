@@ -15,21 +15,25 @@ enum Strategy
     case Auto;
     case Lazy;
 
-    public function isManual(): bool {
+    public function isManual(): bool
+    {
         return $this === self::Manual;
     }
 
-    public function isEagerAuto(): bool {
+    public function isEagerAuto(): bool
+    {
         return $this === self::Auto;
     }
 
-    public function isAuto(): bool {
+    public function isAuto(): bool
+    {
         return
             $this === self::Auto ||
             $this === self::Lazy;
     }
 
-    public function isLazy(): bool {
+    public function isLazy(): bool
+    {
         return $this === self::Lazy;
     }
 }

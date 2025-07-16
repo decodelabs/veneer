@@ -16,7 +16,6 @@ use DecodeLabs\Veneer;
 use DecodeLabs\Veneer\Plugin\Wrapper as PluginWrapper;
 use DecodeLabs\Veneer\Proxy\ClassGenerator;
 use ReflectionClass;
-use Throwable;
 
 class Binding
 {
@@ -93,7 +92,7 @@ class Binding
             $instance = $container->get($this->providerClass);
         }
 
-        if($this->proxyClass === Veneer::class) {
+        if ($this->proxyClass === Veneer::class) {
             $instance = Manager::getGlobalManager();
         }
 
@@ -106,11 +105,11 @@ class Binding
             $ref = new ReflectionClass($this->providerClass);
             $deferred = true;
 
-            $instance = $ref->newLazyGhost(function($instance) use($containerProvider, $ref) {
+            $instance = $ref->newLazyGhost(function ($instance) use ($containerProvider, $ref) {
                 $container = $containerProvider->container;
 
                 // Call constructor
-                if($ref->hasMethod('__construct')) {
+                if ($ref->hasMethod('__construct')) {
                     $method = $ref->getMethod('__construct');
                     $closure = $method->getClosure($instance);
                     $needsSlingshot = false;
@@ -122,8 +121,8 @@ class Binding
                         }
                     }
 
-                    if($needsSlingshot) {
-                        if(!class_exists(Slingshot::class)) {
+                    if ($needsSlingshot) {
+                        if (!class_exists(Slingshot::class)) {
                             throw Exceptional::ComponentUnavailable(
                                 message: 'Cannot resolve constructor dependencies without Slingshot'
                             );
@@ -140,8 +139,8 @@ class Binding
 
 
                 // Apply plugins
-                foreach($this->getPlugins() as $name => $plugin) {
-                    if(
+                foreach ($this->getPlugins() as $name => $plugin) {
+                    if (
                         !$plugin->auto ||
                         !isset($this->proxy::$$name) ||
                         $this->proxy::$$name instanceof PluginWrapper
@@ -187,7 +186,7 @@ class Binding
         object $instance,
         ContainerProvider $containerProvider
     ): void {
-        if(
+        if (
             !class_exists(PandoraContainer::class) ||
             !($container = $containerProvider->container) instanceof PandoraContainer
         ) {
@@ -280,7 +279,8 @@ class Binding
         return $output;
     }
 
-    private function shouldCacheBindings(): bool {
+    private function shouldCacheBindings(): bool
+    {
         return defined('__PHPSTAN_RUNNING__');
     }
 
@@ -290,7 +290,8 @@ class Binding
     /**
      * Find list of plugin names
      */
-    private function scanPlugins(): void {
+    private function scanPlugins(): void
+    {
         $this->plugins = [];
 
         $ref = new ReflectionClass($this->providerClass);
@@ -380,7 +381,7 @@ class Binding
                 containerProvider: $containerProvider
             );
 
-            if(
+            if (
                 !$object instanceof PluginWrapper &&
                 !$instanceLazy
             ) {
@@ -396,17 +397,17 @@ class Binding
         ContainerProvider $containerProvider
     ): object {
         // Already loaded
-        if(
+        if (
             !$instanceLazy &&
             $plugin->property->isInitialized($instance)
         ) {
-            /** @var object */
+            /** @var object $output */
             $output = $plugin->property->getValue($instance);
             return $output;
         }
 
         // Instant load eager auto
-        if($plugin->strategy->isEagerAuto()) {
+        if ($plugin->strategy->isEagerAuto()) {
             // Use isset to trigger get hooks
             // @phpstan-ignore-next-line
             isset($instance->{$plugin->name});
@@ -414,14 +415,14 @@ class Binding
         }
 
         // Use lazy proxy for instantiable classes
-        if($plugin->isInstantiable()) {
-            return $plugin->reflection->newLazyProxy(function($proxy) use($plugin, $instance, $containerProvider) {
+        if ($plugin->isInstantiable()) {
+            return $plugin->reflection->newLazyProxy(function ($proxy) use ($plugin, $instance, $containerProvider) {
                 return $plugin->load($instance, $containerProvider, $proxy);
             });
         }
 
         // Use a PluginWrapper as proxy for internal classes and interfaces
-        return new PluginWrapper(function() use($plugin, $instance, $containerProvider) {
+        return new PluginWrapper(function () use ($plugin, $instance, $containerProvider) {
             $output = $plugin->load($instance, $containerProvider);
             $name = $plugin->name;
             $this->proxy::$$name = $output;

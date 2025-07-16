@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace DecodeLabs\PHPStan;
 
-use DecodeLabs\PHPStan\StaticMethodReflection;
 use DecodeLabs\Veneer\Proxy;
 use Exception;
 use PHPStan\Analyser\OutOfClassScope;
