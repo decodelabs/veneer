@@ -43,7 +43,7 @@ class Manager implements ContainerProvider
                         continue;
                     }
 
-                    $this->container->bindShared($providerClass, $instance);
+                    $this->container->bind($providerClass, $instance);
                 }
             }
         }

@@ -194,7 +194,7 @@ class Binding
         }
 
         if (!$container->has($this->providerClass)) {
-            $container->bindShared($this->providerClass, $instance);
+            $container->bind($this->providerClass, $instance);
         }
     }
 
