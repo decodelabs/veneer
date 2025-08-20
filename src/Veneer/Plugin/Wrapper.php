@@ -39,8 +39,6 @@ class Wrapper implements
 
 
     /**
-     * Init with loader
-     *
      * @param callable(): T $loader
      */
     public function __construct(
@@ -87,9 +85,6 @@ class Wrapper implements
     }
 
 
-    /**
-     * Set offset
-     */
     public function offsetSet(
         mixed $offset,
         mixed $value
@@ -107,9 +102,7 @@ class Wrapper implements
         $this->plugin->offsetSet($offset, $value);
     }
 
-    /**
-     * Get offset
-     */
+
     public function offsetGet(
         mixed $offset
     ): mixed {
@@ -126,9 +119,7 @@ class Wrapper implements
         return $this->plugin->offsetGet($offset);
     }
 
-    /**
-     * Check if offset exists
-     */
+
     public function offsetExists(
         mixed $offset
     ): bool {
@@ -145,9 +136,7 @@ class Wrapper implements
         return $this->plugin->offsetExists($offset);
     }
 
-    /**
-     * Unset offset
-     */
+
     public function offsetUnset(
         mixed $offset
     ): void {
@@ -165,9 +154,7 @@ class Wrapper implements
     }
 
 
-    /**
-     * Get iterator
-     */
+
     public function getIterator(): Traversable
     {
         if ($this->plugin === null) {
@@ -187,9 +174,7 @@ class Wrapper implements
         return $this->plugin;
     }
 
-    /**
-     * Convert to string
-     */
+
     public function __toString(): string
     {
         if ($this->plugin === null) {

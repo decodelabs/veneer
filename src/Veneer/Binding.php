@@ -38,8 +38,6 @@ class Binding
 
 
     /**
-     * Init with criteria
-     *
      * @param class-string $providerClass
      * @param class-string $proxyClass
      */
@@ -53,8 +51,6 @@ class Binding
 
 
     /**
-     * Get container provider class
-     *
      * @return class-string
      */
     public function getProviderClass(): string
@@ -63,8 +59,6 @@ class Binding
     }
 
     /**
-     * Get facade proxy class
-     *
      * @return class-string
      */
     public function getProxyClass(): string
@@ -74,8 +68,6 @@ class Binding
 
 
     /**
-     * Bind instance to proxy
-     *
      * @return $this
      */
     public function mount(
@@ -201,9 +193,6 @@ class Binding
 
 
 
-    /**
-     * Has instance been bound to target
-     */
     public function hasInstance(): bool
     {
         return
@@ -211,9 +200,6 @@ class Binding
             $this->proxy::_getVeneerInstance() !== null;
     }
 
-    /**
-     * Get bound instance
-     */
     public function getInstance(): ?object
     {
         if ($this->proxy === null) {
@@ -224,9 +210,6 @@ class Binding
     }
 
 
-    /**
-     * Get bind proxy
-     */
     public function getProxy(): Proxy
     {
         if ($this->proxy === null) {
@@ -242,8 +225,6 @@ class Binding
 
 
     /**
-     * Create binding class
-     *
      * @param class-string $instanceClass
      */
     private function createProxyClass(
@@ -287,9 +268,6 @@ class Binding
 
 
 
-    /**
-     * Find list of plugin names
-     */
     private function scanPlugins(): void
     {
         $this->plugins = [];
@@ -313,8 +291,6 @@ class Binding
 
 
     /**
-     * Get plugins
-     *
      * @return array<string,Plugin>
      */
     public function getPlugins(): array
@@ -328,8 +304,6 @@ class Binding
     }
 
     /**
-     * Get plugin names
-     *
      * @return array<string>
      */
     public function getPluginNames(): array
@@ -337,18 +311,12 @@ class Binding
         return array_keys($this->getPlugins());
     }
 
-    /**
-     * Get plugin by name
-     */
     public function getPlugin(
         string $name
     ): ?Plugin {
         return $this->getPlugins()[$name] ?? null;
     }
 
-    /**
-     * Has plugin by name
-     */
     public function hasPlugin(
         string $name
     ): bool {
@@ -357,9 +325,6 @@ class Binding
 
 
 
-    /**
-     * Load plugins from target
-     */
     private function loadPlugins(
         object $instance,
         ContainerProvider $containerProvider

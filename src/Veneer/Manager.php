@@ -56,9 +56,6 @@ class Manager implements ContainerProvider
     }
 
 
-    /**
-     * Get singleton instance
-     */
     public static function getGlobalManager(): Manager
     {
         if (self::$instance === null) {
@@ -69,18 +66,12 @@ class Manager implements ContainerProvider
     }
 
 
-    /**
-     * Init with container and loader
-     */
     public function __construct()
     {
         spl_autoload_register($this->mount(...));
     }
 
 
-    /**
-     * Handle autoload
-     */
     protected function mount(
         string $class
     ): void {
@@ -99,8 +90,6 @@ class Manager implements ContainerProvider
     }
 
     /**
-     * Add alias that can be used from root namespace
-     *
      * @param class-string $providerClass
      * @param class-string $proxyClass
      */
@@ -118,18 +107,12 @@ class Manager implements ContainerProvider
         return true;
     }
 
-    /**
-     * Has class been bound?
-     */
     public function has(
         string $proxyClass
     ): bool {
         return isset($this->bindings[$proxyClass]);
     }
 
-    /**
-     * Replace instance of plugin
-     */
     public function replacePlugin(
         object $instance,
         string $name,
@@ -146,9 +129,6 @@ class Manager implements ContainerProvider
         $proxy::$$name = $plugin;
     }
 
-    /**
-     * Find binding for class of instance
-     */
     protected function getBindingForInstance(
         object $instance
     ): Binding {
@@ -168,8 +148,6 @@ class Manager implements ContainerProvider
     }
 
     /**
-     * Get all bindings
-     *
      * @return array<string,Binding>
      */
     public function getBindings(
@@ -192,9 +170,6 @@ class Manager implements ContainerProvider
         return $output;
     }
 
-    /**
-     * Get single binding
-     */
     public function getBinding(
         string $name,
         bool $mount = false
@@ -216,9 +191,6 @@ class Manager implements ContainerProvider
     }
 
 
-    /**
-     * Create new stub generator
-     */
     public function newStubGenerator(
         string $scanDir,
         string $stubDir

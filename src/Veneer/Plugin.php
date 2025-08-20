@@ -104,8 +104,6 @@ class Plugin
 
 
     /**
-     * Init with strategy options
-     *
      * @param ?class-string<object> $type
      */
     public function __construct(
@@ -144,9 +142,6 @@ class Plugin
     }
 
 
-    /**
-     * Load instance
-     */
     public function load(
         object $instance,
         ContainerProvider $containerProvider,

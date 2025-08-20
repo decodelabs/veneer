@@ -163,8 +163,6 @@ class ClassGenerator
     }
 
     /**
-     * List instance class methods
-     *
      * @template T of object
      * @param ReflectionClass<T> $ref
      * @param array<string, string> $uses
@@ -251,8 +249,6 @@ class ClassGenerator
     }
 
     /**
-     * Export type reflection
-     *
      * @param array<string, string> $uses
      */
     private function exportType(
@@ -274,8 +270,6 @@ class ClassGenerator
     }
 
     /**
-     * Export named type reflection
-     *
      * @param array<string, string> $uses
      */
     private function exportNamedType(
@@ -326,8 +320,6 @@ class ClassGenerator
     }
 
     /**
-     * Export union type reflection
-     *
      * @param array<string, string> $uses
      */
     private function exportUnionType(
@@ -344,8 +336,6 @@ class ClassGenerator
     }
 
     /**
-     * Export intersection type reflection
-     *
      * @param array<string, string> $uses
      */
     private function exportIntersectionType(

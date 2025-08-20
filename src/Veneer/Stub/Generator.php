@@ -21,9 +21,6 @@ class Generator
     protected string $scanDir;
     protected string $stubDir;
 
-    /**
-     * Init with stub directory location
-     */
     public function __construct(
         string $scanDir,
         string $stubDir
@@ -33,8 +30,6 @@ class Generator
     }
 
     /**
-     * Scan for bindings
-     *
      * @return array<Binding>
      */
     public function scan(): array
@@ -101,9 +96,6 @@ class Generator
         }
     }
 
-    /**
-     * Generate stub
-     */
     public function generate(
         Binding $binding
     ): void {

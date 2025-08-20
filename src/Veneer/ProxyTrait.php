@@ -18,26 +18,17 @@ trait ProxyTrait
 {
     protected static ?object $_veneerInstance = null;
 
-    /**
-     * Set Veneer Proxy target instance
-     */
     public static function _setVeneerInstance(
         object $instance
     ): void {
         self::$_veneerInstance = $instance;
     }
 
-    /**
-     * Get Veneer Proxy target instance
-     */
     public static function _getVeneerInstance(): ?object
     {
         return self::$_veneerInstance;
     }
 
-    /**
-     * Passthrough all static calls to instance
-     */
     public static function __callStatic(
         string $name,
         array $args
