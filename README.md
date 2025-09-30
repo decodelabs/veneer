@@ -15,6 +15,10 @@ Use Veneer to provide easy access to your most commonly used functionality witho
 
 ## Install
 
+This package requires PHP 8.4 or higher.
+
+Install via Composer:
+
 ```bash
 composer require decodelabs/veneer
 ```
