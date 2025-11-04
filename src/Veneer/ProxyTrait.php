@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @package Veneer
- * @license http://opensource.org/licenses/MIT
+ * Veneer
+ * @license https://opensource.org/licenses/MIT
  */
 
 //declare(strict_types=1);
